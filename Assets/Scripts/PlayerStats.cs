@@ -8,10 +8,12 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int _currentHunger = 100;
     [SerializeField] private int _currentThirst = 100;
     [SerializeField] private float _hungerDecreaseRate = 2f;
-    [SerializeField] private float _thirstDecreaseRate = 3f;
+    [SerializeField] private float _thirstDecreaseRate = 2.5f;
+    [SerializeField] private float _starvationDamageRate = 3f;
 
     private float _hungerTimer;
     private float _thirstTimer;
+    private float _starvationTimer;
 
     public int MaxHealth => _maxHealth;
     public int CurrentHealth => _currentHealth;
@@ -48,7 +50,12 @@ public class PlayerStats : MonoBehaviour
         // Check for player death due to hunger or thirst
         if (_currentHunger <= 0 || _currentThirst <= 0)
         {
-            TakeDamage(1); // Take damage when hunger or thirst reaches zero
+            _starvationTimer += Time.deltaTime;
+            if (_starvationTimer >= 1f)
+            {
+                TakeDamage(1); // Take damage when hunger or thirst reaches zero
+                _starvationTimer = 0f;
+            }
         }
     }
 

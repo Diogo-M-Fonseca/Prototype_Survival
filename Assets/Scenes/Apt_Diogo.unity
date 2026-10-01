@@ -4406,7 +4406,8 @@ MonoBehaviour:
   _currentHunger: 100
   _currentThirst: 100
   _hungerDecreaseRate: 2
-  _thirstDecreaseRate: 3
+  _thirstDecreaseRate: 2.5
+  _starvationDamageRate: 3
 --- !u!114 &971059303
 MonoBehaviour:
   m_ObjectHideFlags: 0
