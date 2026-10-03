@@ -102,4 +102,19 @@ public class Inventory : MonoBehaviour, IInventory
         Changed?.Invoke();
         return true;
     }
+    public bool TransferSlot(int index, Inventory target)
+    {
+        if (target == null || target == this) return false;
+        if ((uint)index >= (uint)slots.Length) return false;
+
+        var s = slots[index];
+        if (s.IsEmpty) return false;
+
+        int left = target.Add(s.Item, s.Amount);
+        if (left == s.Amount) return false;      
+
+        slots[index] = left <= 0 ? default : s.WithAmount(left);
+        Changed?.Invoke();
+        return true;
+    }
 }
