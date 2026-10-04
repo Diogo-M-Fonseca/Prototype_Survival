@@ -102,19 +102,55 @@ public class Inventory : MonoBehaviour, IInventory
         Changed?.Invoke();
         return true;
     }
+
     public bool TransferSlot(int index, Inventory target)
     {
         if (target == null || target == this) return false;
         if ((uint)index >= (uint)slots.Length) return false;
 
-        var s = slots[index];
+        ItemStack s = slots[index];
         if (s.IsEmpty) return false;
 
         int left = target.Add(s.Item, s.Amount);
-        if (left == s.Amount) return false;      
+        if (left == s.Amount) return false;
 
         slots[index] = left <= 0 ? default : s.WithAmount(left);
         Changed?.Invoke();
+        return true;
+    }
+
+    public bool MoveOrSwap(int from, Inventory target, int to)
+    {
+        if (target == null) return false;
+        if ((uint)from >= (uint)slots.Length || (uint)to >= (uint)target.slots.Length) return false;
+        if (target == this && from == to) return false;
+
+        ItemStack a = slots[from];
+        ItemStack b = target.slots[to];
+        if (a.IsEmpty) return false;
+
+        if (!b.IsEmpty && b.Item == a.Item)
+        {
+            int space = a.Item.MaxStack - b.Amount;
+            if (space > 0)
+            {
+                int move = Mathf.Min(space, a.Amount);
+                target.slots[to] = b.WithAmount(b.Amount + move);
+
+                int left = a.Amount - move;
+                slots[from] = left <= 0 ? default : a.WithAmount(left);
+
+                Changed?.Invoke();
+                if (target != this) target.Changed?.Invoke();
+                return true;
+            }
+        }
+
+        slots[from] = b;
+        target.slots[to] = a;
+
+        Changed?.Invoke();
+        if (target != this) target.Changed?.Invoke();
         return true;
     }
 }

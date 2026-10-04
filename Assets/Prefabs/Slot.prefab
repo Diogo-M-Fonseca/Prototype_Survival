@@ -154,7 +154,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7797075708954604581
 RectTransform:
   m_ObjectHideFlags: 0
@@ -378,6 +378,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af9e75269e5a8e945ba0bf3d49d97382, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlotUI
-  icon: {fileID: 0}
-  amountText: {fileID: 0}
-  highlight: {fileID: 0}
+  icon: {fileID: 2147475132675649004}
+  amountText: {fileID: 6570080721844175265}
+  highlight: {fileID: 2356932228707145901}

@@ -1,17 +1,24 @@
 using UnityEngine;
 
-public class ItemPickup : MonoBehaviour
+public class ItemPickup : MonoBehaviour, IInteractable
 {
     [SerializeField] private Item item;
     [SerializeField, Min(1)] private int amount = 1;
 
-    private void OnTriggerEnter(Collider other)
+    public void Interact()
     {
-        var hand = other.GetComponentInChildren<PlayerHands>();
-        if (hand == null) return;
+        if (item == null || PlayerHands.Instance == null) return;
 
-        int left = hand.Inventory.Add(item, amount);
-        if (left <= 0) Destroy(gameObject);
-        else amount = left; // mãos cheias: o resto fica no chão
+        int left = PlayerHands.Instance.Inventory.Add(item, amount);
+
+        if (left <= 0)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            amount = left;
+            Debug.Log("Mãos cheias.");
+        }
     }
 }

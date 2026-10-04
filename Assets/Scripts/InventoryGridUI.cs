@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class InventoryGridUI : MonoBehaviour
 {
@@ -10,8 +11,13 @@ public class InventoryGridUI : MonoBehaviour
 
     private SlotUI[] slotUIs;
 
-    public event Action<int> SlotClicked;
+    public Inventory Inventory => inventory;
     public int SlotCount => slotUIs != null ? slotUIs.Length : 0;
+
+    public event Action<InventoryGridUI, int, PointerEventData> BeginDrag;
+    public event Action<PointerEventData> Drag;
+    public event Action EndDrag;
+    public event Action<InventoryGridUI, int> Drop;
 
     private void Awake()
     {
@@ -21,7 +27,7 @@ public class InventoryGridUI : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             slotUIs[i] = Instantiate(slotPrefab, container);
-            slotUIs[i].Init(i, index => SlotClicked?.Invoke(index));
+            slotUIs[i].Init(this, i);
         }
 
         inventory.Changed += Refresh;
@@ -47,4 +53,16 @@ public class InventoryGridUI : MonoBehaviour
         for (int i = 0; i < slotUIs.Length; i++)
             slotUIs[i].SetSelected(i == index);
     }
+
+    public void SetMarked(int index)
+    {
+        if (slotUIs == null) return;
+        for (int i = 0; i < slotUIs.Length; i++)
+            slotUIs[i].SetMarked(i == index);
+    }
+
+    public void NotifyBeginDrag(int index, PointerEventData e) => BeginDrag?.Invoke(this, index, e);
+    public void NotifyDrag(PointerEventData e) => Drag?.Invoke(e);
+    public void NotifyEndDrag() => EndDrag?.Invoke();
+    public void NotifyDrop(int index) => Drop?.Invoke(this, index);
 }
