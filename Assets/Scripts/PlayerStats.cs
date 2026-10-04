@@ -68,32 +68,28 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    private void Heal(int healAmount)
+    public bool RestoreHealth(int healthAmount)
     {
-        _currentHealth += healAmount;
-        if (_currentHealth > _maxHealth)
-        {
-            _currentHealth = _maxHealth;
-        }
+        if (healthAmount <= 0 || _currentHealth >= _maxHealth) return false;
+
+        _currentHealth = Mathf.Min(_currentHealth + healthAmount, _maxHealth);
+        return true;
     }
 
-    private void recoverHunger(int hungerAmount)
+    public bool RestoreHunger(int hungerAmount)
     {
-        _currentHunger += hungerAmount;
-        if (_currentHunger > 100)
-        {
-            _currentHunger = 100;
-        }
+        if (hungerAmount <= 0 || _currentHunger >= 100) return false;
+
+        _currentHunger = Mathf.Min(_currentHunger + hungerAmount, 100);
+        return true;
     }
 
-    private void recoverThirst(int thirstAmount)
+    public bool RestoreThirst(int thirstAmount)
     {
+        if (thirstAmount <= 0 || _currentThirst >= 100) return false;
+
         _currentThirst += thirstAmount;
-        if (_currentThirst > 100)
-        {
-            _currentThirst = 100;
-        }
+        _currentThirst = Mathf.Min(_currentThirst, 100);
+        return true;
     }
-
-
 }
