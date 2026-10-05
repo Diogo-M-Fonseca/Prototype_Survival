@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Item", menuName = "Items/Inventory Item")]
+[CreateAssetMenu(fileName = "New Item", menuName = "Items/Foods and Drinks")]
 public class FoodsAndDrinks : Item
 {
     [SerializeField] private RestoreStat statToRestore = RestoreStat.Thirst;

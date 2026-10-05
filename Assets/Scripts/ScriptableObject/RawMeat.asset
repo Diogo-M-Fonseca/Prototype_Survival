@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13ed1b8a78e43d248a991afab16c89de, type: 3}
-  m_Name: EnergyBar
+  m_Name: RawMeat
   m_EditorClassIdentifier: Assembly-CSharp::FoodsAndDrinks
-  displayName: Energy Bar
+  displayName: Raw Meat
   description: 
-  icon: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  icon: {fileID: 0}
   maxStack: 1
   heldPrefab: {fileID: 0}
   hasDurability: 1
-  maxDurability: 200
+  maxDurability: 100
   statToRestore: 0
-  amountRestored: 25
+  amountRestored: 15

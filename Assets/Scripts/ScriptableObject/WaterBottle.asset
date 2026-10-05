@@ -17,4 +17,7 @@ MonoBehaviour:
   icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   maxStack: 1
   heldPrefab: {fileID: 0}
+  hasDurability: 1
+  maxDurability: 200
+  statToRestore: 2
   amountRestored: 35
