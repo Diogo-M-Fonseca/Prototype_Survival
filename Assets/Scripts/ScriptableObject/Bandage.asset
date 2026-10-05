@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ed1b8a78e43d248a991afab16c89de, type: 3}
   m_Name: Bandage
   m_EditorClassIdentifier: Assembly-CSharp::FoodsAndDrinks
-  displayName: Bandage
-  description: 
-  icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  maxStack: 1
-  heldPrefab: {fileID: 0}
-  statToRestore: 1
-  amountRestored: 40
+  _displayName: Bandage
+  _description: 
+  _icon: {fileID: 0}
+  _maxStack: 10
+  _heldPrefab: {fileID: 3442909145797624916, guid: 7b456b9214dbd3a4494daf8f16ead770, type: 3}
+  _hasDurability: 0
+  _maxDurability: 100
+  _statCount: 1
+  _statsToRestore: 01000000
+  _amountsRestored: 32000000

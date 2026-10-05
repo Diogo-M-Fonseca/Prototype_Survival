@@ -4,15 +4,15 @@ using UnityEngine.EventSystems;
 
 public class InventoryGridUI : MonoBehaviour
 {
-    [SerializeField] private Inventory inventory;
-    [SerializeField] private SlotUI slotPrefab;
-    [SerializeField] private Transform container;
-    [SerializeField, Min(1)] private int slotCount = 9;
+    [SerializeField] private Inventory _inventory;
+    [SerializeField] private SlotUI _slotPrefab;
+    [SerializeField] private Transform _Grid;
+    [SerializeField, Min(1)] private int _slotCount = 9;
 
-    private SlotUI[] slotUIs;
+    private SlotUI[] _slotUIs;
 
-    public Inventory Inventory => inventory;
-    public int SlotCount => slotUIs != null ? slotUIs.Length : 0;
+    public Inventory Inventory => _inventory;
+    public int SlotCount => _slotUIs != null ? _slotUIs.Length : 0;
 
     public event Action<InventoryGridUI, int, PointerEventData> BeginDrag;
     public event Action<PointerEventData> Drag;
@@ -21,44 +21,44 @@ public class InventoryGridUI : MonoBehaviour
 
     private void Awake()
     {
-        int count = Mathf.Min(slotCount, inventory.Size);
-        slotUIs = new SlotUI[count];
+        int count = Mathf.Min(_slotCount, _inventory.Size);
+        _slotUIs = new SlotUI[count];
 
         for (int i = 0; i < count; i++)
         {
-            slotUIs[i] = Instantiate(slotPrefab, container);
-            slotUIs[i].Init(this, i);
+            _slotUIs[i] = Instantiate(_slotPrefab, _Grid);
+            _slotUIs[i].Init(this, i);
         }
 
-        inventory.Changed += Refresh;
+        _inventory.Changed += Refresh;
     }
 
     private void OnEnable() => Refresh();
 
     private void OnDestroy()
     {
-        if (inventory != null) inventory.Changed -= Refresh;
+        if (_inventory != null) _inventory.Changed -= Refresh;
     }
 
     public void Refresh()
     {
-        if (slotUIs == null) return;
-        for (int i = 0; i < slotUIs.Length; i++)
-            slotUIs[i].Set(inventory[i]);
+        if (_slotUIs == null) return;
+        for (int i = 0; i < _slotUIs.Length; i++)
+            _slotUIs[i].Set(_inventory[i]);
     }
 
     public void SetSelected(int index)
     {
-        if (slotUIs == null) return;
-        for (int i = 0; i < slotUIs.Length; i++)
-            slotUIs[i].SetSelected(i == index);
+        if (_slotUIs == null) return;
+        for (int i = 0; i < _slotUIs.Length; i++)
+            _slotUIs[i].SetSelected(i == index);
     }
 
     public void SetMarked(int index)
     {
-        if (slotUIs == null) return;
-        for (int i = 0; i < slotUIs.Length; i++)
-            slotUIs[i].SetMarked(i == index);
+        if (_slotUIs == null) return;
+        for (int i = 0; i < _slotUIs.Length; i++)
+            _slotUIs[i].SetMarked(i == index);
     }
 
     public void NotifyBeginDrag(int index, PointerEventData e) => BeginDrag?.Invoke(this, index, e);

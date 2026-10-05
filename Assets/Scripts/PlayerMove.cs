@@ -3,41 +3,40 @@ using UnityEngine.InputSystem;
 
 public class PlayerMove : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float gravity = -9.81f;
-    private float verticalVelocity;
-    private CharacterController controller;
-    private InputAction moveAction;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private float _moveSpeed = 5f;
+    [SerializeField] private float _gravity = -9.81f;
+    private float _verticalVelocity;
+    private CharacterController _controller;
+    private InputAction _moveAction;
+
     void Start()
     {
-        controller = GetComponent<CharacterController>();
-        moveAction = InputSystem.actions.FindAction("Move");
-        if (moveAction == null)
+        _controller = GetComponent<CharacterController>();
+        _moveAction = InputSystem.actions.FindAction("Move");
+        if (_moveAction == null)
         {
             Debug.LogError("Move action not found on PlayerMove script.");
         }
 
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Vector2 moveInput = moveAction.ReadValue<Vector2>();
+        Vector2 moveInput = _moveAction.ReadValue<Vector2>();
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         move = Vector3.ClampMagnitude(move, 1f);
-        controller.Move(move * moveSpeed * Time.deltaTime);
+        _controller.Move(move * _moveSpeed * Time.deltaTime);
 
         // Apply gravity
-        if (controller.isGrounded && verticalVelocity < 0)
+        if (_controller.isGrounded && _verticalVelocity < 0)
         {
-            verticalVelocity = -2f; 
+            _verticalVelocity = -2f; 
         }
         else
         {
-            verticalVelocity += gravity * Time.deltaTime;
+            _verticalVelocity += _gravity * Time.deltaTime;
         }
 
-        controller.Move(new Vector3(0, verticalVelocity, 0) * Time.deltaTime);
+        _controller.Move(new Vector3(0, _verticalVelocity, 0) * Time.deltaTime);
     }
 }

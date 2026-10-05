@@ -6,27 +6,27 @@ using UnityEngine.UI;
 
 public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
-    [SerializeField] private Image icon;
-    [SerializeField] private TMP_Text amountText;
-    [SerializeField] private GameObject highlight;
-    [SerializeField] private Color markedColor = new Color(1f, 0.85f, 0.3f, 0.8f);
+    [SerializeField] private Image _icon;
+    [SerializeField] private TMP_Text _amountText;
+    [SerializeField] private GameObject _highlight;
+    [SerializeField] private Color _markedColor = new Color(1f, 0.85f, 0.3f, 0.8f);
 
-    private Image background;
-    private Color baseColor;
-    private InventoryGridUI owner;
-    private int index;
+    private Image _background;
+    private Color _baseColor;
+    private InventoryGridUI _owner;
+    private int _index;
 
     private void Awake()
     {
-        background = GetComponent<Image>();
-        if (background != null) baseColor = background.color;
+        _background = GetComponent<Image>();
+        if (_background != null) _baseColor = _background.color;
         SetSelected(false);
     }
 
     public void Init(InventoryGridUI owner, int index)
     {
-        this.owner = owner;
-        this.index = index;
+        this._owner = owner;
+        this._index = index;
     }
 
     public void Set(ItemStack stack)
@@ -34,23 +34,23 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         bool empty = stack.IsEmpty;
         Sprite sprite = empty ? null : stack.Item.Icon;
 
-        icon.sprite = sprite;
-        icon.enabled = sprite != null;
-        amountText.text = (!empty && stack.Amount > 1) ? stack.Amount.ToString() : "";
+        _icon.sprite = sprite;
+        _icon.enabled = sprite != null;
+        _amountText.text = (!empty && stack.Amount > 1) ? stack.Amount.ToString() : "";
     }
 
     public void SetSelected(bool selected)
     {
-        if (highlight != null) highlight.SetActive(selected);
+        if (_highlight != null) _highlight.SetActive(selected);
     }
 
     public void SetMarked(bool marked)
     {
-        if (background != null) background.color = marked ? markedColor : baseColor;
+        if (_background != null) _background.color = marked ? _markedColor : _baseColor;
     }
 
-    public void OnBeginDrag(PointerEventData e) => owner.NotifyBeginDrag(index, e);
-    public void OnDrag(PointerEventData e) => owner.NotifyDrag(e);
-    public void OnEndDrag(PointerEventData e) => owner.NotifyEndDrag();
-    public void OnDrop(PointerEventData e) => owner.NotifyDrop(index);
+    public void OnBeginDrag(PointerEventData e) => _owner.NotifyBeginDrag(_index, e);
+    public void OnDrag(PointerEventData e) => _owner.NotifyDrag(e);
+    public void OnEndDrag(PointerEventData e) => _owner.NotifyEndDrag();
+    public void OnDrop(PointerEventData e) => _owner.NotifyDrop(_index);
 }

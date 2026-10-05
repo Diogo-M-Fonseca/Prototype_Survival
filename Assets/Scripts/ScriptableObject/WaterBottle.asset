@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ed1b8a78e43d248a991afab16c89de, type: 3}
   m_Name: WaterBottle
   m_EditorClassIdentifier: Assembly-CSharp::WaterBottleItem
-  displayName: Water Bottle
-  description: 
-  icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  maxStack: 1
-  heldPrefab: {fileID: 0}
-  hasDurability: 1
-  maxDurability: 200
-  statToRestore: 2
-  amountRestored: 35
+  _displayName: Water Bottle
+  _description: 
+  _icon: {fileID: 0}
+  _maxStack: 10
+  _heldPrefab: {fileID: 2589605692606058765, guid: f74debdd51e32204fa19a703aa2d4ad0, type: 3}
+  _hasDurability: 0
+  _maxDurability: 100
+  _statCount: 1
+  _statsToRestore: 00000000
+  _amountsRestored: 1e000000

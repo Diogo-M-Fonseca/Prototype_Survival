@@ -4,17 +4,17 @@ using UnityEngine.InputSystem;
 
 public class InventoryToggle : MonoBehaviour
 {
-    [SerializeField] private GameObject panel;
+    [SerializeField] private GameObject _panel;
 
-    private InputAction toggleAction;
+    private InputAction _toggleAction;
 
     public bool IsOpen { get; private set; }
     public event Action<bool> Toggled;
 
-    private void Awake() => toggleAction = InputSystem.actions.FindAction("Player/ToggleBag", true);
+    private void Awake() => _toggleAction = InputSystem.actions.FindAction("Player/ToggleBag", true);
 
-    private void OnEnable() => toggleAction.performed += OnToggle;
-    private void OnDisable() => toggleAction.performed -= OnToggle;
+    private void OnEnable() => _toggleAction.performed += OnToggle;
+    private void OnDisable() => _toggleAction.performed -= OnToggle;
 
     private void Start() => SetOpen(false);
 
@@ -23,7 +23,7 @@ public class InventoryToggle : MonoBehaviour
     private void SetOpen(bool open)
     {
         IsOpen = open;
-        panel.SetActive(open);
+        _panel.SetActive(open);
 
         Cursor.lockState = open ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = open;

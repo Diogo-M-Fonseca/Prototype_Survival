@@ -4,39 +4,39 @@ using UnityEngine.UI;
 
 public class InventoryTransfer : MonoBehaviour
 {
-    [SerializeField] private InventoryGridUI handUI;
-    [SerializeField] private InventoryGridUI bagUI;
-    [SerializeField] private GameObject bagPanel;
-    [SerializeField] private Vector2 ghostSize = new Vector2(100f, 100f);
+    [SerializeField] private InventoryGridUI _handUI;
+    [SerializeField] private InventoryGridUI _bagUI;
+    [SerializeField] private GameObject _bagPanel;
+    [SerializeField] private Vector2 _ghostSize = new Vector2(100f, 100f);
 
-    private RectTransform ghost;
-    private Image ghostImage;
-    private InventoryGridUI sourceGrid;
-    private int sourceIndex = -1;
+    private RectTransform _ghost;
+    private Image _ghostImage;
+    private InventoryGridUI _sourceGrid;
+    private int _sourceIndex = -1;
 
-    private bool Dragging => sourceGrid != null;
+    private bool Dragging => _sourceGrid != null;
 
     private void Awake() => CreateGhost();
 
     private void CreateGhost()
     {
         GameObject go = new GameObject("DragGhost", typeof(RectTransform), typeof(CanvasGroup), typeof(Image));
-        ghost = go.GetComponent<RectTransform>();
-        ghost.SetParent(transform, false);
-        ghost.sizeDelta = ghostSize;
+        _ghost = go.GetComponent<RectTransform>();
+        _ghost.SetParent(transform, false);
+        _ghost.sizeDelta = _ghostSize;
 
         go.GetComponent<CanvasGroup>().blocksRaycasts = false; // não bloqueia o drop
 
-        ghostImage = go.GetComponent<Image>();
-        ghostImage.raycastTarget = false;
-        ghostImage.preserveAspect = true;
+        _ghostImage = go.GetComponent<Image>();
+        _ghostImage.raycastTarget = false;
+        _ghostImage.preserveAspect = true;
 
         go.SetActive(false);
     }
 
     private void OnEnable()
     {
-        foreach (InventoryGridUI grid in new[] { handUI, bagUI })
+        foreach (InventoryGridUI grid in new[] { _handUI, _bagUI })
         {
             grid.BeginDrag += HandleBegin;
             grid.Drag += HandleDrag;
@@ -47,7 +47,7 @@ public class InventoryTransfer : MonoBehaviour
 
     private void OnDisable()
     {
-        foreach (InventoryGridUI grid in new[] { handUI, bagUI })
+        foreach (InventoryGridUI grid in new[] { _handUI, _bagUI })
         {
             grid.BeginDrag -= HandleBegin;
             grid.Drag -= HandleDrag;
@@ -59,45 +59,45 @@ public class InventoryTransfer : MonoBehaviour
 
     private void Update()
     {
-        if (Dragging && !bagPanel.activeSelf) CancelDrag();
+        if (Dragging && !_bagPanel.activeSelf) CancelDrag();
     }
 
     private void HandleBegin(InventoryGridUI grid, int index, PointerEventData e)
     {
-        if (!bagPanel.activeSelf) return;
+        if (!_bagPanel.activeSelf) return;
 
         var stack = grid.Inventory[index];
         if (stack.IsEmpty) return;
 
-        sourceGrid = grid;
-        sourceIndex = index;
+        _sourceGrid = grid;
+        _sourceIndex = index;
         grid.SetMarked(index);
 
         Sprite sprite = stack.Item.Icon;
-        ghostImage.sprite = sprite;
-        ghostImage.color = sprite != null ? Color.white : new Color(1f, 1f, 1f, 0.5f);
+        _ghostImage.sprite = sprite;
+        _ghostImage.color = sprite != null ? Color.white : new Color(1f, 1f, 1f, 0.5f);
 
-        ghost.position = e.position;
-        ghost.gameObject.SetActive(true);
-        ghost.SetAsLastSibling();
+        _ghost.position = e.position;
+        _ghost.gameObject.SetActive(true);
+        _ghost.SetAsLastSibling();
     }
 
     private void HandleDrag(PointerEventData e)
     {
-        if (Dragging) ghost.position = e.position;
+        if (Dragging) _ghost.position = e.position;
     }
 
     private void HandleDrop(InventoryGridUI target, int index)
     {
         if (!Dragging) return;
-        sourceGrid.Inventory.MoveOrSwap(sourceIndex, target.Inventory, index);
+        _sourceGrid.Inventory.MoveOrSwap(_sourceIndex, target.Inventory, index);
     }
 
     private void CancelDrag()
     {
-        if (sourceGrid != null) sourceGrid.SetMarked(-1);
-        sourceGrid = null;
-        sourceIndex = -1;
-        if (ghost != null) ghost.gameObject.SetActive(false);
+        if (_sourceGrid != null) _sourceGrid.SetMarked(-1);
+        _sourceGrid = null;
+        _sourceIndex = -1;
+        if (_ghost != null) _ghost.gameObject.SetActive(false);
     }
 }

@@ -4,28 +4,28 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public class Inventory : MonoBehaviour, IInventory
 {
-    [SerializeField, Min(1)] private int size = 20;
+    [SerializeField, Min(1)] private int _size = 20;
 
-    private ItemStack[] slots;
+    private ItemStack[] _slots;
 
     public event Action Changed;
 
-    public int Size => size;
-    public ItemStack this[int i] => slots[i];
+    public int Size => _size;
+    public ItemStack this[int i] => _slots[i];
 
-    private void Awake() => slots = new ItemStack[size];
+    private void Awake() => _slots = new ItemStack[_size];
 
     private void Update()
     {
         bool changed = false;
 
-        for (int i = 0; i < slots.Length; i++)
+        for (int i = 0; i < _slots.Length; i++)
         {
-            ItemStack slot = slots[i];
+            ItemStack slot = _slots[i];
             if (slot.IsEmpty || !slot.Item.HasDurability) continue;
 
             float remaining = slot.DurabilityRemaining - Time.deltaTime;
-            slots[i] = remaining <= 0f
+            _slots[i] = remaining <= 0f
                 ? default
                 : slot.WithDurability(remaining);
             changed = true;
@@ -40,23 +40,23 @@ public class Inventory : MonoBehaviour, IInventory
 
         int remaining = amount;
 
-        for (int i = 0; i < slots.Length && remaining > 0; i++)
+        for (int i = 0; i < _slots.Length && remaining > 0; i++)
         {
-            if (slots[i].IsEmpty || slots[i].Item != item) continue;
+            if (_slots[i].IsEmpty || _slots[i].Item != item) continue;
 
-            int add = Mathf.Min(remaining, item.MaxStack - slots[i].Amount);
+            int add = Mathf.Min(remaining, item.MaxStack - _slots[i].Amount);
             if (add <= 0) continue;
 
-            slots[i] = slots[i].WithAmount(slots[i].Amount + add);
+            _slots[i] = _slots[i].WithAmount(_slots[i].Amount + add);
             remaining -= add;
         }
 
-        for (int i = 0; i < slots.Length && remaining > 0; i++)
+        for (int i = 0; i < _slots.Length && remaining > 0; i++)
         {
-            if (!slots[i].IsEmpty) continue;
+            if (!_slots[i].IsEmpty) continue;
 
             int add = Mathf.Min(remaining, item.MaxStack);
-            slots[i] = new ItemStack(item, add);
+            _slots[i] = new ItemStack(item, add);
             remaining -= add;
         }
 
@@ -68,7 +68,7 @@ public class Inventory : MonoBehaviour, IInventory
     {
         if (item == null) return false;
 
-        foreach (ItemStack s in slots)
+        foreach (ItemStack s in _slots)
         {
             if (amount <= 0) break;
 
@@ -83,7 +83,7 @@ public class Inventory : MonoBehaviour, IInventory
         if (item == null) return 0;
 
         int total = 0;
-        foreach (ItemStack s in slots)
+        foreach (ItemStack s in _slots)
             if (!s.IsEmpty && s.Item == item) total += s.Amount;
         return total;
     }
@@ -94,13 +94,13 @@ public class Inventory : MonoBehaviour, IInventory
     {
         if (item == null || amount <= 0 || !Has(item, amount)) return false;
 
-        for (int i = slots.Length - 1; i >= 0 && amount > 0; i--)
+        for (int i = _slots.Length - 1; i >= 0 && amount > 0; i--)
         {
-            if (slots[i].IsEmpty || slots[i].Item != item) continue;
+            if (_slots[i].IsEmpty || _slots[i].Item != item) continue;
 
-            int take = Mathf.Min(amount, slots[i].Amount);
-            int left = slots[i].Amount - take;
-            slots[i] = left <= 0 ? default : slots[i].WithAmount(left);
+            int take = Mathf.Min(amount, _slots[i].Amount);
+            int left = _slots[i].Amount - take;
+            _slots[i] = left <= 0 ? default : _slots[i].WithAmount(left);
             amount -= take;
         }
 
@@ -110,13 +110,13 @@ public class Inventory : MonoBehaviour, IInventory
 
     public bool UseSlot(int index, GameObject user)
     {
-        if ((uint)index >= (uint)slots.Length) return false;
+        if ((uint)index >= (uint)_slots.Length) return false;
 
-        ItemStack slot = slots[index];
+        ItemStack slot = _slots[index];
         if (slot.IsEmpty || !slot.Item.Use(user)) return false;
 
         int left = slot.Amount - 1;
-        slots[index] = left <= 0 ? default : slot.WithAmount(left);
+        _slots[index] = left <= 0 ? default : slot.WithAmount(left);
 
         Changed?.Invoke();
         return true;
@@ -125,15 +125,15 @@ public class Inventory : MonoBehaviour, IInventory
     public bool TransferSlot(int index, Inventory target)
     {
         if (target == null || target == this) return false;
-        if ((uint)index >= (uint)slots.Length) return false;
+        if ((uint)index >= (uint)_slots.Length) return false;
 
-        ItemStack s = slots[index];
+        ItemStack s = _slots[index];
         if (s.IsEmpty) return false;
         if (!target.CanAdd(s.Item, s.Amount)) return false;
 
         if (!target.TryAddStack(s)) return false;
 
-        slots[index] = default;
+        _slots[index] = default;
         Changed?.Invoke();
         return true;
     }
@@ -145,11 +145,11 @@ public class Inventory : MonoBehaviour, IInventory
         if (!stack.Item.HasDurability)
             return Add(stack.Item, stack.Amount) == 0;
 
-        for (int i = 0; i < slots.Length; i++)
+        for (int i = 0; i < _slots.Length; i++)
         {
-            if (!slots[i].IsEmpty) continue;
+            if (!_slots[i].IsEmpty) continue;
 
-            slots[i] = stack;
+            _slots[i] = stack;
             Changed?.Invoke();
             return true;
         }
@@ -160,11 +160,11 @@ public class Inventory : MonoBehaviour, IInventory
     public bool MoveOrSwap(int from, Inventory target, int to)
     {
         if (target == null) return false;
-        if ((uint)from >= (uint)slots.Length || (uint)to >= (uint)target.slots.Length) return false;
+        if ((uint)from >= (uint)_slots.Length || (uint)to >= (uint)target._slots.Length) return false;
         if (target == this && from == to) return false;
 
-        ItemStack a = slots[from];
-        ItemStack b = target.slots[to];
+        ItemStack a = _slots[from];
+        ItemStack b = target._slots[to];
         if (a.IsEmpty) return false;
 
         if (!b.IsEmpty && b.Item == a.Item)
@@ -173,10 +173,10 @@ public class Inventory : MonoBehaviour, IInventory
             if (space > 0)
             {
                 int move = Mathf.Min(space, a.Amount);
-                target.slots[to] = b.WithAmount(b.Amount + move);
+                target._slots[to] = b.WithAmount(b.Amount + move);
 
                 int left = a.Amount - move;
-                slots[from] = left <= 0 ? default : a.WithAmount(left);
+                _slots[from] = left <= 0 ? default : a.WithAmount(left);
 
                 Changed?.Invoke();
                 if (target != this) target.Changed?.Invoke();
@@ -184,8 +184,8 @@ public class Inventory : MonoBehaviour, IInventory
             }
         }
 
-        slots[from] = b;
-        target.slots[to] = a;
+        _slots[from] = b;
+        target._slots[to] = a;
 
         Changed?.Invoke();
         if (target != this) target.Changed?.Invoke();

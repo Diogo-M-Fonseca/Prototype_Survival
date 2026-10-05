@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ed1b8a78e43d248a991afab16c89de, type: 3}
   m_Name: EnergyBar
   m_EditorClassIdentifier: Assembly-CSharp::FoodsAndDrinks
-  displayName: Energy Bar
-  description: 
-  icon: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
-  maxStack: 1
-  heldPrefab: {fileID: 0}
-  hasDurability: 1
-  maxDurability: 200
-  statToRestore: 0
-  amountRestored: 25
+  _displayName: Energy Bar
+  _description: 
+  _icon: {fileID: 0}
+  _maxStack: 20
+  _heldPrefab: {fileID: 4633844183926349423, guid: 09ccda515d8247c48a948ba62e2b4293, type: 3}
+  _hasDurability: 0
+  _maxDurability: 100
+  _statCount: 1
+  _statsToRestore: 00000000
+  _amountsRestored: 1e000000

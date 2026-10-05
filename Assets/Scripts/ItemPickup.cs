@@ -1,15 +1,29 @@
+using NUnit;
 using UnityEngine;
 
-public class ItemPickup : MonoBehaviour, IInteractable
+public class ItemPickup : Interactable
 {
-    [SerializeField] private Item item;
-    [SerializeField, Min(1)] private int amount = 1;
+    [SerializeField] private Item _item;
+    [SerializeField, Min(1)] private int _amount = 1;
 
-    public void Interact()
+    protected override string DefaultPrompt => "pickup";
+
+    protected override void OnInteract(GameObject interactor)
     {
-        if (item == null || PlayerHands.Instance == null) return;
+        if (_item == null)
+        {
+            Debug.LogError($"{name}: campo 'item' vazio no Inspector", this);
+            return;
+        }
 
-        int left = PlayerHands.Instance.Inventory.Add(item, amount);
+        PlayerHands hands = interactor.transform.root.GetComponentInChildren<PlayerHands>();
+        if (hands == null)
+        {
+            Debug.LogError($"{name}: PlayerHands não encontrado a partir de '{interactor.name}'", this);
+            return;
+        }
+
+        int left = hands.Inventory.Add(_item, _amount);
 
         if (left <= 0)
         {
@@ -17,7 +31,7 @@ public class ItemPickup : MonoBehaviour, IInteractable
         }
         else
         {
-            amount = left;
+            _amount = left;
             Debug.Log("Mãos cheias.");
         }
     }
