@@ -15,6 +15,25 @@ public class Inventory : MonoBehaviour, IInventory
 
     private void Awake() => slots = new ItemStack[size];
 
+    private void Update()
+    {
+        bool changed = false;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            ItemStack slot = slots[i];
+            if (slot.IsEmpty || !slot.Item.HasDurability) continue;
+
+            float remaining = slot.DurabilityRemaining - Time.deltaTime;
+            slots[i] = remaining <= 0f
+                ? default
+                : slot.WithDurability(remaining);
+            changed = true;
+        }
+
+        if (changed) Changed?.Invoke();
+    }
+
     public int Add(Item item, int amount)
     {
         if (item == null || amount <= 0) return amount;
@@ -110,13 +129,32 @@ public class Inventory : MonoBehaviour, IInventory
 
         ItemStack s = slots[index];
         if (s.IsEmpty) return false;
+        if (!target.CanAdd(s.Item, s.Amount)) return false;
 
-        int left = target.Add(s.Item, s.Amount);
-        if (left == s.Amount) return false;
+        if (!target.TryAddStack(s)) return false;
 
-        slots[index] = left <= 0 ? default : s.WithAmount(left);
+        slots[index] = default;
         Changed?.Invoke();
         return true;
+    }
+
+    private bool TryAddStack(ItemStack stack)
+    {
+        if (stack.IsEmpty) return false;
+
+        if (!stack.Item.HasDurability)
+            return Add(stack.Item, stack.Amount) == 0;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (!slots[i].IsEmpty) continue;
+
+            slots[i] = stack;
+            Changed?.Invoke();
+            return true;
+        }
+
+        return false;
     }
 
     public bool MoveOrSwap(int from, Inventory target, int to)
