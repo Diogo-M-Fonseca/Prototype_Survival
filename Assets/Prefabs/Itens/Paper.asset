@@ -15,7 +15,7 @@ MonoBehaviour:
   _displayName: Paper
   _description: 
   _icon: {fileID: 0}
-  _maxStack: 64
+  _maxStack: 16
   _heldPrefab: {fileID: 4633844183926349423, guid: 1425376303da0424aa504e95d0649773, type: 3}
   _hasDurability: 0
   _maxDurability: 100

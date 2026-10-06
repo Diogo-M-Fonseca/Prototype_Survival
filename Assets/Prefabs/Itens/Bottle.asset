@@ -19,4 +19,4 @@ MonoBehaviour:
   _heldPrefab: {fileID: 2589605692606058765, guid: 78e944043725811478060d286ddeeb0a, type: 3}
   _hasDurability: 0
   _maxDurability: 100
-  _baseMaterials: 00000000
+  _baseMaterials: 03000000
