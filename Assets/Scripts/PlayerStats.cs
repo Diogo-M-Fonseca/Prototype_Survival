@@ -2,17 +2,19 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
-    // Player stats
     [SerializeField] private int _maxHealth = 100;
     [SerializeField] private int _currentHealth;
     [SerializeField] private int _currentHunger = 100;
     [SerializeField] private int _currentThirst = 100;
+
+    [Tooltip("Pontos de fome perdidos por segundo.")]
     [SerializeField] private float _hungerDecreaseRate = 2f;
+    [Tooltip("Pontos de sede perdidos por segundo.")]
     [SerializeField] private float _thirstDecreaseRate = 2.5f;
     [SerializeField] private float _starvationDamageRate = 3f;
 
-    private float _hungerTimer;
-    private float _thirstTimer;
+    private float _hungerDrain;
+    private float _thirstDrain;
     private float _starvationTimer;
 
     public int MaxHealth => _maxHealth;
@@ -27,36 +29,33 @@ public class PlayerStats : MonoBehaviour
 
     private void Update()
     {
-        // Decrease hunger and thirst over time
-        _hungerTimer += Time.deltaTime;
-        _thirstTimer += Time.deltaTime;
+        _currentHunger -= Drain(ref _hungerDrain, _hungerDecreaseRate);
+        _currentThirst -= Drain(ref _thirstDrain, _thirstDecreaseRate);
 
-        if (_hungerTimer >= 1f)
-        {
-            _currentHunger -= Mathf.RoundToInt(_hungerDecreaseRate * Time.deltaTime * 100); // Multiply by 100 to convert to integer
-            _hungerTimer = 0f;
-        }
-
-        if (_thirstTimer >= 1f)
-        {
-            _currentThirst -= Mathf.RoundToInt(_thirstDecreaseRate * Time.deltaTime * 100); // Multiply by 100 to convert to integer
-            _thirstTimer = 0f;
-        }
-
-        // Clamp hunger and thirst values
         _currentHunger = Mathf.Clamp(_currentHunger, 0, 100);
         _currentThirst = Mathf.Clamp(_currentThirst, 0, 100);
 
-        // Check for player death due to hunger or thirst
         if (_currentHunger <= 0 || _currentThirst <= 0)
         {
             _starvationTimer += Time.deltaTime;
             if (_starvationTimer >= 1f)
             {
-                TakeDamage(1); // Take damage when hunger or thirst reaches zero
+                TakeDamage(1);
                 _starvationTimer = 0f;
             }
         }
+        else
+        {
+            _starvationTimer = 0f;
+        }
+    }
+
+    private static int Drain(ref float accumulator, float ratePerSecond)
+    {
+        accumulator += ratePerSecond * Time.deltaTime;
+        int whole = Mathf.FloorToInt(accumulator);
+        accumulator -= whole;
+        return whole;
     }
 
     private void TakeDamage(int damage)
@@ -88,8 +87,7 @@ public class PlayerStats : MonoBehaviour
     {
         if (thirstAmount <= 0 || _currentThirst >= 100) return false;
 
-        _currentThirst += thirstAmount;
-        _currentThirst = Mathf.Min(_currentThirst, 100);
+        _currentThirst = Mathf.Min(_currentThirst + thirstAmount, 100);
         return true;
     }
 }

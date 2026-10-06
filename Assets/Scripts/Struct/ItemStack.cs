@@ -22,7 +22,12 @@ public struct ItemStack
     public float DurabilityRemaining => _durabilityRemaining;
     public bool IsEmpty => _item == null || _amount <= 0;
 
-    public ItemStack WithAmount(int newAmount) => new ItemStack(_item, newAmount);
+    public ItemStack WithAmount(int newAmount)
+    {
+        ItemStack result = this;
+        result._amount = newAmount;
+        return result;
+    }
 
     public ItemStack WithDurability(float newDurability)
     {

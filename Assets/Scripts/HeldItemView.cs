@@ -8,6 +8,7 @@ public class HeldItemView : MonoBehaviour
 
     private GameObject _current;
     private Item _currentItem;
+    private int _currentIndex = -1;
 
     private void OnEnable()
     {
@@ -29,8 +30,9 @@ public class HeldItemView : MonoBehaviour
         int i = _hotbar.Selected;
         Item item = (i < 0 || _hands[i].IsEmpty) ? null : _hands[i].Item;
 
-        if (item == _currentItem) return;   // nada mudou, não recria
+        if (item == _currentItem && i == _currentIndex) return;
         _currentItem = item;
+        _currentIndex = i;
 
         if (_current != null) Destroy(_current);
         _current = null;

@@ -6,9 +6,13 @@ public class Inventory : MonoBehaviour, IInventory
 {
     [SerializeField, Min(1)] private int _size = 20;
 
-    [SerializeField, Min(0f)] private float _durabilityRate = 1f; 
+    [SerializeField, Min(0f)] private float _durabilityRate = 1f;
+
+    [SerializeField, Min(0.05f)] private float _durabilityNotifyInterval = 0.25f;
 
     private ItemStack[] _slots;
+    private float _notifyTimer;
+    private bool _durabilityDirty;
 
     public event Action Changed;
 
@@ -23,7 +27,7 @@ public class Inventory : MonoBehaviour, IInventory
         if (_durabilityRate <= 0f) return;
 
         float decay = Time.deltaTime * _durabilityRate;
-        bool changed = false;
+        bool broke = false;
 
         for (int i = 0; i < _slots.Length; i++)
         {
@@ -31,13 +35,27 @@ public class Inventory : MonoBehaviour, IInventory
             if (slot.IsEmpty || !slot.Item.HasDurability) continue;
 
             float remaining = slot.DurabilityRemaining - decay;
-            _slots[i] = remaining <= 0f
-                ? default
-                : slot.WithDurability(remaining);
-            changed = true;
+            if (remaining <= 0f)
+            {
+                _slots[i] = default;
+                broke = true;
+            }
+            else
+            {
+                _slots[i] = slot.WithDurability(remaining);
+            }
+            _durabilityDirty = true;
         }
 
-        if (changed) Changed?.Invoke();
+        if (!_durabilityDirty) return;
+
+        _notifyTimer += Time.deltaTime;
+        if (broke || _notifyTimer >= _durabilityNotifyInterval)
+        {
+            _notifyTimer = 0f;
+            _durabilityDirty = false;
+            Changed?.Invoke();
+        }
     }
 
     public int Add(Item item, int amount)

@@ -15,6 +15,8 @@ public class HotbarController : MonoBehaviour
     public int Selected => _selected;
     public event Action<int> SelectionChanged;
 
+    private bool BagOpen => _bagToggle != null && _bagToggle.IsOpen;
+
     private void Awake()
     {
         _selectAction = InputSystem.actions.FindAction("Player/HotbarSelect", true);
@@ -37,7 +39,7 @@ public class HotbarController : MonoBehaviour
 
     private void Update()
     {
-        if (_bagToggle != null && _bagToggle.IsOpen) return;
+        if (BagOpen) return;
         if (Mouse.current == null || _hotbarUI.SlotCount == 0) return;
 
         float scroll = Mouse.current.scroll.ReadValue().y;
@@ -61,7 +63,7 @@ public class HotbarController : MonoBehaviour
 
     private void OnUse(InputAction.CallbackContext ctx)
     {
-        if (_bagToggle.IsOpen || _selected < 0) return;
+        if (BagOpen || _selected < 0) return;
         _inventory.UseSlot(_selected, gameObject);
     }
 

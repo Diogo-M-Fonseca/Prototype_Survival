@@ -11,24 +11,48 @@ public class StorageUI : MonoBehaviour
     private StorageContainer _current;
     private Transform _interactor;
 
-    private bool IsOpen => _panel.activeSelf;
+    private bool IsOpen => _panel != null && _panel.activeSelf;
 
     private void Awake()
     {
+        if (_panel == null)
+        {
+            Debug.LogError("StorageUI: campo '_panel' vazio no Inspector.", this);
+            return;
+        }
+
         if (_panel == gameObject)
         {
-            Debug.LogError("StorageUI não pode estar no próprio painel. Move-o para o Canvas.", this);
+            Debug.LogError("StorageUI nao pode estar no proprio painel. Move-o para o Canvas.", this);
             return;
         }
         _panel.SetActive(false);
     }
 
-    private void OnEnable() => _bagToggle.Toggled += OnBagToggled;
-    private void OnDisable() => _bagToggle.Toggled -= OnBagToggled;
+    private void OnEnable()
+    {
+        if (_bagToggle == null)
+        {
+            Debug.LogError("StorageUI: campo '_bagToggle' vazio no Inspector.", this);
+            return;
+        }
+        _bagToggle.Toggled += OnBagToggled;
+    }
+
+    private void OnDisable()
+    {
+        if (_bagToggle != null) _bagToggle.Toggled -= OnBagToggled;
+    }
 
     public void Open(StorageContainer container, Transform interactor)
     {
         if (container == null) return;
+
+        if (_bagToggle == null || _panel == null || _grid == null)
+        {
+            Debug.LogError("StorageUI: faltam referencias no Inspector (_bagToggle, _panel ou _grid).", this);
+            return;
+        }
 
         _current = container;
         _interactor = interactor;
@@ -40,7 +64,10 @@ public class StorageUI : MonoBehaviour
         _bagToggle.Open();
     }
 
-    public void Close() => _bagToggle.Close();
+    public void Close()
+    {
+        if (_bagToggle != null) _bagToggle.Close();
+    }
 
     private void OnBagToggled(bool open)
     {
@@ -51,8 +78,8 @@ public class StorageUI : MonoBehaviour
     {
         _current = null;
         _interactor = null;
-        _grid.Unbind();
-        _panel.SetActive(false);
+        if (_grid != null) _grid.Unbind();
+        if (_panel != null) _panel.SetActive(false);
     }
 
     private void Update()
