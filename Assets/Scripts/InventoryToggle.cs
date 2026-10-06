@@ -20,6 +20,10 @@ public class InventoryToggle : MonoBehaviour
 
     private void OnToggle(InputAction.CallbackContext ctx) => SetOpen(!IsOpen);
 
+    public void Open() => SetOpen(true);
+    public void Close() => SetOpen(false);
+
+
     private void SetOpen(bool open)
     {
         IsOpen = open;

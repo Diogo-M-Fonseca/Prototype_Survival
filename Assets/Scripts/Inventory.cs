@@ -6,17 +6,23 @@ public class Inventory : MonoBehaviour, IInventory
 {
     [SerializeField, Min(1)] private int _size = 20;
 
+    [SerializeField, Min(0f)] private float _durabilityRate = 1f; 
+
     private ItemStack[] _slots;
 
     public event Action Changed;
 
     public int Size => _size;
+    public float DurabilityRate => _durabilityRate;
     public ItemStack this[int i] => _slots[i];
 
     private void Awake() => _slots = new ItemStack[_size];
 
     private void Update()
     {
+        if (_durabilityRate <= 0f) return;
+
+        float decay = Time.deltaTime * _durabilityRate;
         bool changed = false;
 
         for (int i = 0; i < _slots.Length; i++)
@@ -24,7 +30,7 @@ public class Inventory : MonoBehaviour, IInventory
             ItemStack slot = _slots[i];
             if (slot.IsEmpty || !slot.Item.HasDurability) continue;
 
-            float remaining = slot.DurabilityRemaining - Time.deltaTime;
+            float remaining = slot.DurabilityRemaining - decay;
             _slots[i] = remaining <= 0f
                 ? default
                 : slot.WithDurability(remaining);

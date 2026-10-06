@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 public class InventoryTransfer : MonoBehaviour
 {
-    [SerializeField] private InventoryGridUI _handUI;
-    [SerializeField] private InventoryGridUI _bagUI;
+    [SerializeField] private InventoryGridUI[] _grids;
     [SerializeField] private GameObject _bagPanel;
     [SerializeField] private Vector2 _ghostSize = new Vector2(100f, 100f);
 
@@ -25,7 +24,7 @@ public class InventoryTransfer : MonoBehaviour
         _ghost.SetParent(transform, false);
         _ghost.sizeDelta = _ghostSize;
 
-        go.GetComponent<CanvasGroup>().blocksRaycasts = false; // não bloqueia o drop
+        go.GetComponent<CanvasGroup>().blocksRaycasts = false;
 
         _ghostImage = go.GetComponent<Image>();
         _ghostImage.raycastTarget = false;
@@ -36,8 +35,9 @@ public class InventoryTransfer : MonoBehaviour
 
     private void OnEnable()
     {
-        foreach (InventoryGridUI grid in new[] { _handUI, _bagUI })
+        foreach (InventoryGridUI grid in _grids)
         {
+            if (grid == null) continue;
             grid.BeginDrag += HandleBegin;
             grid.Drag += HandleDrag;
             grid.EndDrag += CancelDrag;
@@ -47,8 +47,9 @@ public class InventoryTransfer : MonoBehaviour
 
     private void OnDisable()
     {
-        foreach (InventoryGridUI grid in new[] { _handUI, _bagUI })
+        foreach (InventoryGridUI grid in _grids)
         {
+            if (grid == null) continue;
             grid.BeginDrag -= HandleBegin;
             grid.Drag -= HandleDrag;
             grid.EndDrag -= CancelDrag;
@@ -64,7 +65,7 @@ public class InventoryTransfer : MonoBehaviour
 
     private void HandleBegin(InventoryGridUI grid, int index, PointerEventData e)
     {
-        if (!_bagPanel.activeSelf) return;
+        if (!_bagPanel.activeSelf || grid.Inventory == null) return;
 
         var stack = grid.Inventory[index];
         if (stack.IsEmpty) return;
@@ -89,7 +90,7 @@ public class InventoryTransfer : MonoBehaviour
 
     private void HandleDrop(InventoryGridUI target, int index)
     {
-        if (!Dragging) return;
+        if (!Dragging || target.Inventory == null || _sourceGrid.Inventory == null) return;
         _sourceGrid.Inventory.MoveOrSwap(_sourceIndex, target.Inventory, index);
     }
 
