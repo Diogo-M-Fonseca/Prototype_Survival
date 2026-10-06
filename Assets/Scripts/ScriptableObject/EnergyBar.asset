@@ -19,6 +19,6 @@ MonoBehaviour:
   _heldPrefab: {fileID: 4633844183926349423, guid: 09ccda515d8247c48a948ba62e2b4293, type: 3}
   _hasDurability: 0
   _maxDurability: 100
-  _statCount: 1
-  _statsToRestore: 00000000
-  _amountsRestored: 1e000000
+  _restores:
+  - _stat: 0
+    _amount: 30
