@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d50713c31d60bad429e1e801a0656db8, type: 3}
+  m_Name: EmptyBottle
+  m_EditorClassIdentifier: Assembly-CSharp::OtherItems
+  _displayName: Empty Bottle
+  _description: 
+  _icon: {fileID: 0}
+  _maxStack: 10
+  _heldPrefab: {fileID: 2309535532108280822, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+  _hasDurability: 0
+  _maxDurability: 100
+  _leftoverItem: {fileID: 0}
+  _tags:
+  - {fileID: 11400000, guid: 86bdb42b03504314c85b22e65329a401, type: 2}
+  _baseMaterials: 03000000

@@ -562,6 +562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
   _size: 9
   _durabilityRate: 1
+  _durabilityNotifyInterval: 0.25
 --- !u!1 &69482216
 GameObject:
   m_ObjectHideFlags: 0
@@ -948,6 +949,7 @@ GameObject:
   - component: {fileID: 108675303}
   - component: {fileID: 108675302}
   - component: {fileID: 108675301}
+  - component: {fileID: 108675304}
   m_Layer: 0
   m_Name: Stove
   m_TagString: Untagged
@@ -1048,6 +1050,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 108675299}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &108675304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 108675299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7446b0cceb89ce48ad536a637717c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemTarget
+  _canUse: 1
+  _rules:
+  - _requiredTag: {fileID: 11400000, guid: 86bdb42b03504314c85b22e65329a401, type: 2}
+    _result: {fileID: 11400000, guid: de299aad265f24a4cb2b93029f514d61, type: 2}
+    _consumeItem: 1
+    _onUsed:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &135332414
 GameObject:
   m_ObjectHideFlags: 0
@@ -1282,6 +1304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
   _size: 20
   _durabilityRate: 1
+  _durabilityNotifyInterval: 0.25
 --- !u!114 &170513902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2929,6 +2952,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
   _size: 20
   _durabilityRate: 1
+  _durabilityNotifyInterval: 0.25
 --- !u!1 &543055621
 GameObject:
   m_ObjectHideFlags: 0
@@ -4886,6 +4910,7 @@ MonoBehaviour:
   _inventory: {fileID: 67639179}
   _hotbarUI: {fileID: 2096574916}
   _bagToggle: {fileID: 971059305}
+  _interaction: {fileID: 971059306}
 --- !u!114 &971059305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8421,6 +8446,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
   _size: 12
   _durabilityRate: 0.5
+  _durabilityNotifyInterval: 0.25
 --- !u!114 &1556884337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11287,6 +11313,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7b456b9214dbd3a4494daf8f16ead770, type: 3}
+--- !u!1001 &4459305241693206456
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2309535532108280822, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_Name
+      value: Empty Bottle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.44
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6029554296131694229, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 677a4d693a0e23548a225267aad8058c, type: 3}
 --- !u!1001 &5333358288366867560
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11354,6 +11437,7 @@ SceneRoots:
   - {fileID: 7874743}
   - {fileID: 1616721148}
   - {fileID: 480339715838662681}
+  - {fileID: 4459305241693206456}
   - {fileID: 1303241428}
   - {fileID: 1989672762}
   - {fileID: 5333358288366867560}
