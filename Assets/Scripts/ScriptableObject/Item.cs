@@ -20,7 +20,7 @@ public abstract class Item : ScriptableObject
     {
         get
         {
-            if (_resolvedIcon != null)
+            if (_resolvedIcon == null)
             {
                 Sprite generated = _heldPrefab != null ? ItemIconRenderer.Get(_heldPrefab) : null;
                 _resolvedIcon = generated != null ? generated : _icon;
@@ -39,7 +39,7 @@ public abstract class Item : ScriptableObject
 
     public virtual bool Use(GameObject user) => false;
 
-    private void OnValidate()
+    protected virtual void OnValidate()
     {
         if (_hasDurability) _maxStack = 1;
         _resolvedIcon = null;

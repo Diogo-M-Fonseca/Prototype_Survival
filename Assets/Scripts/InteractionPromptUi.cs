@@ -14,14 +14,9 @@ public class InteractionPromptUi : MonoBehaviour
     [SerializeField] private Color _ActiveColor = Color.green;
     [SerializeField, Min(0.1f)] private float _activeScale = 1.5f;
 
-    private bool _wasActive;
     private IInteractable _lastTarget;
     private string _lastPrompt;
 
-    private void Start()
-    {
-       Apply(false);
-    }
 
     private void LateUpdate()
     {

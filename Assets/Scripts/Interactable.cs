@@ -10,17 +10,15 @@ public abstract class Interactable : MonoBehaviour, IInteractable
     public virtual string Prompt => string.IsNullOrEmpty(_prompt) ? DefaultPrompt : _prompt;
     public virtual bool CanInteract => _canInteract;
 
-    public void SetInteractable(bool value)
-    {
-        _canInteract = value;
-    }
+    public void SetInteractable(bool value) => _canInteract = value;
 
     public void Interact(GameObject interactor)
     {
-       if (_canInteract)
-       {
-            OnInteract(interactor);
-       }
+        if (!CanInteract)
+        {
+            return;
+        }
+        OnInteract(interactor);
     }
 
     protected abstract void OnInteract(GameObject interactor);

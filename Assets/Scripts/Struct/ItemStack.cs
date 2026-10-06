@@ -10,8 +10,8 @@ public struct ItemStack
 
     public ItemStack(Item item, int amount)
     {
-        this._item = item;
-        this._amount = amount;
+        _item = item;
+        _amount = amount;
         _durabilityRemaining = item != null && item.HasDurability
             ? item.MaxDurability
             : -1f;

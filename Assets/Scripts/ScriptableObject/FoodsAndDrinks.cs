@@ -3,46 +3,37 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Item", menuName = "Items/Foods and Drinks")]
 public class FoodsAndDrinks : Item
 {
-    [SerializeField, Range(1, 3)] private int _statCount = 1;
-    [SerializeField] private RestoreStat[] _statsToRestore = new RestoreStat[1];
-    [SerializeField] private int[] _amountsRestored = new int[1];
-
-    public int StatCount => _statCount;
+    private const int MaxRestores = 3;
+    [SerializeField] private StatRestore[] _restores = new StatRestore[1];
+    public int StatCount => _restores != null ? _restores.Length : 0;
 
     public override bool Use(GameObject user)
     {
-        if (user == null) return false;
+        if (user == null || _restores == null) return false;
 
         PlayerStats stats = user.GetComponentInParent<PlayerStats>();
         if (stats == null) return false;
 
         bool used = false;
-        for (int i = 0; i < _statCount; i++)
+        foreach (StatRestore r in _restores)
         {
-            int amount = _amountsRestored[i];
-            if (amount <= 0) continue;
+            if (r.Amount <= 0) continue;
 
-            switch (_statsToRestore[i])
+            switch (r.Stat)
             {
-                case RestoreStat.Hunger: used |= stats.RestoreHunger(amount); break;
-                case RestoreStat.Health: used |= stats.RestoreHealth(amount); break;
-                case RestoreStat.Thirst: used |= stats.RestoreThirst(amount); break;
+                case RestoreStat.Hunger: used |= stats.RestoreHunger(r.Amount); break;
+                case RestoreStat.Health: used |= stats.RestoreHealth(r.Amount); break;
+                case RestoreStat.Thirst: used |= stats.RestoreThirst(r.Amount); break;
             }
         }
         return used;
     }
 
-    private void OnValidate()
+    protected override void OnValidate()
     {
-        _statCount = Mathf.Clamp(_statCount, 1, 3);
+        base.OnValidate();
 
-        if (_statsToRestore == null || _statsToRestore.Length != _statCount)
-        {
-            System.Array.Resize(ref _statsToRestore, _statCount);
-        }
-        if (_amountsRestored == null || _amountsRestored.Length != _statCount)
-        {
-            System.Array.Resize(ref _amountsRestored, _statCount);
-        }
+        if (_restores != null && _restores.Length > MaxRestores)
+            System.Array.Resize(ref _restores, MaxRestores);
     }
 }
