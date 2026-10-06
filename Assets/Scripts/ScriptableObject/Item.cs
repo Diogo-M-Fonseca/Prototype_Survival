@@ -10,6 +10,8 @@ public abstract class Item : ScriptableObject
     [SerializeField] private bool _hasDurability;
     [SerializeField, Min(1)] private int _maxDurability = 100;
 
+    private Sprite _resolvedIcon;
+
     public string DisplayName => string.IsNullOrEmpty(_displayName) ? name : _displayName;
 
     public string Description => _description;
@@ -18,8 +20,12 @@ public abstract class Item : ScriptableObject
     {
         get
         {
-            Sprite generated = _heldPrefab != null ? ItemIconRenderer.Get(_heldPrefab) : null;
-            return generated != null ? generated : _icon;
+            if (_resolvedIcon != null)
+            {
+                Sprite generated = _heldPrefab != null ? ItemIconRenderer.Get(_heldPrefab) : null;
+                _resolvedIcon = generated != null ? generated : _icon;
+            }
+            return _resolvedIcon;
         }
     }
 
@@ -36,5 +42,6 @@ public abstract class Item : ScriptableObject
     private void OnValidate()
     {
         if (_hasDurability) _maxStack = 1;
+        _resolvedIcon = null;
     }
 }

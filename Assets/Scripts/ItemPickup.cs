@@ -1,4 +1,3 @@
-using NUnit;
 using UnityEngine;
 
 public class ItemPickup : Interactable
