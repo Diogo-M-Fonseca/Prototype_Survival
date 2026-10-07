@@ -648,6 +648,7 @@ GameObject:
   - component: {fileID: 6192327525446938990}
   - component: {fileID: 2430513093863330857}
   - component: {fileID: 6895661885431181520}
+  - component: {fileID: 6572356934489461813}
   m_Layer: 0
   m_Name: Cabinet_Base_Sink_01
   m_TagString: Untagged
@@ -753,6 +754,27 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -6041596989059598143, guid: 2a83511a782a6aa4dafed1f5a2bd3803, type: 3}
+--- !u!114 &6572356934489461813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5820748979278948837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7446b0cceb89ce48ad536a637717c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemTarget
+  _canUse: 1
+  _rules:
+  - _requiredTag: {fileID: 11400000, guid: 86bdb42b03504314c85b22e65329a401, type: 2}
+    _result: {fileID: 11400000, guid: de299aad265f24a4cb2b93029f514d61, type: 2}
+    _consumeItem: 1
+    _usePrompt: Fill
+    _onUsed:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &6459493246525791013
 GameObject:
   m_ObjectHideFlags: 0

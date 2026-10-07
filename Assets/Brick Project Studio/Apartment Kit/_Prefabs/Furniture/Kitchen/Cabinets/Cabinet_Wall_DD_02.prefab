@@ -104,6 +104,8 @@ GameObject:
   - component: {fileID: 1796458219}
   - component: {fileID: 254736740582461206}
   - component: {fileID: 4327011968338145505}
+  - component: {fileID: 1141995155511639907}
+  - component: {fileID: 3497584348375520549}
   m_Layer: 0
   m_Name: Cabinet_Wall_DD_02
   m_TagString: Untagged
@@ -223,6 +225,37 @@ MonoBehaviour:
   _durabilityRate: 1
   _durabilityNotifyInterval: 0.25
 --- !u!114 &4327011968338145505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830421572321717154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44f70dfa574015e40a62269b64ef3082, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageContainer
+  _prompt: 
+  _canInteract: 1
+  _title: Kitchen Container
+  _closeDistance: 4
+--- !u!114 &1141995155511639907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830421572321717154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ce9ab792abdb954a99cccf78cfd9280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory
+  _size: 10
+  _durabilityRate: 1
+  _durabilityNotifyInterval: 0.25
+--- !u!114 &3497584348375520549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

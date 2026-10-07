@@ -1032,6 +1032,8 @@ GameObject:
   - component: {fileID: 6387659738291265067}
   - component: {fileID: 833915979649433122}
   - component: {fileID: 2854669981766674941}
+  - component: {fileID: 5175532060398624198}
+  - component: {fileID: 7500454641659797656}
   m_Layer: 0
   m_Name: Dresser_Apt_01
   m_TagString: Untagged
@@ -1149,6 +1151,37 @@ MonoBehaviour:
   _durabilityRate: 1
   _durabilityNotifyInterval: 0.25
 --- !u!114 &2854669981766674941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7043932511323071429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44f70dfa574015e40a62269b64ef3082, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageContainer
+  _prompt: 
+  _canInteract: 1
+  _title: Dresser
+  _closeDistance: 4
+--- !u!114 &5175532060398624198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7043932511323071429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ce9ab792abdb954a99cccf78cfd9280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory
+  _size: 20
+  _durabilityRate: 1
+  _durabilityNotifyInterval: 0.25
+--- !u!114 &7500454641659797656
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
