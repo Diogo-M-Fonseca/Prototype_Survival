@@ -47,6 +47,7 @@ public partial class GameplayToolkit : EditorWindow
         public Item Result;
         public string Action;   // none | enable | disable | trigger
         public string Arg;      // nome do filho (enable/disable) ou do trigger (trigger)
+        public string Prompt;   // mensagem no retículo quando se aponta com o item
     }
 
     // ------------------------------------------------------------------ constantes
@@ -90,7 +91,8 @@ Bandage Recipe: 2 Cloth + 1 Alcohol -> 3 Bandage
 
     private const string RulesExample =
 @"# Etiqueta | consume=true/false | result=Item | on=enable:Filho / disable:Filho / trigger:NomeDoTrigger
-Key | consume=true | result=UsedKey | on=trigger:Open
+Key | consume=true | result=UsedKey | on=trigger:Open | msg=unlock
+EmptyBottle | consume=true | result=Water Bottle | msg=fill bottle
 ";
 
     // ------------------------------------------------------------------ estado da janela
@@ -246,7 +248,7 @@ Key | consume=true | result=UsedKey | on=trigger:Open
         if (_textMode)
         {
             EditorGUILayout.HelpBox(
-                "Uma linha por regra:  Etiqueta | consume=true/false | result=Item | on=...\n" +
+                "Uma linha por regra:  Etiqueta | consume=true/false | result=Item | on=... | msg=Texto\n" +
                 "on=enable:Filho  /  disable:Filho  (sem nome = o próprio objeto)  /  trigger:NomeDoTrigger (Animator).",
                 MessageType.None);
             _rulesText = EditorGUILayout.TextArea(_rulesText, GUILayout.MinHeight(70));
@@ -706,6 +708,7 @@ Key | consume=true | result=UsedKey | on=trigger:Open
             if (tag == null) { Err(line, "etiqueta inválida."); continue; }
 
             var spec = new RuleSpec { Tag = tag, Consume = ParseBool(line.Get("consume"), true) };
+            spec.Prompt = line.Get("msg");
 
             string result = line.Get("result");
             if (result != null && !IsOff(result))
@@ -765,6 +768,9 @@ Key | consume=true | result=UsedKey | on=trigger:Open
                 el.FindPropertyRelative("_requiredTag").objectReferenceValue = spec.Tag;
                 el.FindPropertyRelative("_consumeItem").boolValue = spec.Consume;
                 el.FindPropertyRelative("_result").objectReferenceValue = spec.Result;
+                SerializedProperty promptProp = el.FindPropertyRelative("_usePrompt");
+                if (promptProp != null) promptProp.stringValue = spec.Prompt ?? "";
+                else Warn("ItemUseRule não tem o campo _usePrompt: atualiza o script ItemUseRule.");
                 WriteAction(el.FindPropertyRelative("_onUsed"), go, spec);
             }
 
@@ -790,32 +796,32 @@ Key | consume=true | result=UsedKey | on=trigger:Open
         {
             case "enable":
             case "disable":
-            {
-                GameObject go = self;
-                if (!string.IsNullOrEmpty(spec.Arg))
                 {
-                    Transform child = FindDeep(self.transform, spec.Arg);
-                    if (child == null) { Warn($"{self.name}: filho '{spec.Arg}' não encontrado; evento ignorado."); return; }
-                    go = child.gameObject;
+                    GameObject go = self;
+                    if (!string.IsNullOrEmpty(spec.Arg))
+                    {
+                        Transform child = FindDeep(self.transform, spec.Arg);
+                        if (child == null) { Warn($"{self.name}: filho '{spec.Arg}' não encontrado; evento ignorado."); return; }
+                        go = child.gameObject;
+                    }
+
+                    bool enable = spec.Action == "enable";
+                    AddCall(calls, go, typeof(GameObject), "SetActive", 6,
+                            args => args.FindPropertyRelative("m_BoolArgument").boolValue = enable);
+                    break;
                 }
 
-                bool enable = spec.Action == "enable";
-                AddCall(calls, go, typeof(GameObject), "SetActive", 6,
-                        args => args.FindPropertyRelative("m_BoolArgument").boolValue = enable);
-                break;
-            }
-
             case "trigger":
-            {
-                Animator anim = self.GetComponentInChildren<Animator>(true);
-                if (anim == null) anim = self.GetComponentInParent<Animator>();
-                if (anim == null) { Warn($"{self.name}: não há Animator; evento ignorado."); return; }
+                {
+                    Animator anim = self.GetComponentInChildren<Animator>(true);
+                    if (anim == null) anim = self.GetComponentInParent<Animator>();
+                    if (anim == null) { Warn($"{self.name}: não há Animator; evento ignorado."); return; }
 
-                string trigger = spec.Arg;
-                AddCall(calls, anim, typeof(Animator), "SetTrigger", 5,
-                        args => args.FindPropertyRelative("m_StringArgument").stringValue = trigger);
-                break;
-            }
+                    string trigger = spec.Arg;
+                    AddCall(calls, anim, typeof(Animator), "SetTrigger", 5,
+                            args => args.FindPropertyRelative("m_StringArgument").stringValue = trigger);
+                    break;
+                }
         }
     }
 

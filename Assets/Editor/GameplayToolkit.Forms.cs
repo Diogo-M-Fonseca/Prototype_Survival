@@ -26,6 +26,7 @@ public partial class GameplayToolkit
         public Item Result;
         public ActionKind Action;
         public string Arg;
+        public string Prompt;
     }
 
     [Serializable]
@@ -406,6 +407,7 @@ public partial class GameplayToolkit
                 r.Arg = EditorGUILayout.TextField("Filho (vazio = o próprio)", r.Arg);
             else if (r.Action == ActionKind.Trigger)
                 r.Arg = EditorGUILayout.TextField("Nome do trigger (Animator)", r.Arg);
+            r.Prompt = EditorGUILayout.TextField("Mensagem no retículo", r.Prompt);
             EditorGUILayout.EndVertical();
 
             _ruleRows[i] = r;
@@ -446,7 +448,8 @@ public partial class GameplayToolkit
                 Consume = r.Consume,
                 Result = r.Consume ? r.Result : null,
                 Action = action,
-                Arg = arg
+                Arg = arg,
+                Prompt = r.Prompt
             });
         }
 
