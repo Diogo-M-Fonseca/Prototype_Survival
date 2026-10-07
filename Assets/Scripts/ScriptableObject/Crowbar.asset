@@ -9,18 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d50713c31d60bad429e1e801a0656db8, type: 3}
-  m_Name: Door
-  m_EditorClassIdentifier: Assembly-CSharp::OtherItems
-  _displayName: 
+  m_Script: {fileID: 11500000, guid: 0389a9bfa3a42d64095dfc1dc1f0468a, type: 3}
+  m_Name: Crowbar
+  m_EditorClassIdentifier: Assembly-CSharp::Tools
+  _displayName: Crowbar
   _description: 
   _icon: {fileID: 0}
   _maxStack: 1
-  _heldPrefab: {fileID: 0}
+  _heldPrefab: {fileID: 100000, guid: c56b9df7cee41024aaf65cae7565754f, type: 3}
   _hasDurability: 0
   _maxDurability: 100
   _leftoverItem: {fileID: 0}
   _tags: []
-  _baseMaterials: 000000000000000000000000
-  _durability: 1
-  _gameObject: {fileID: 0}
+  _toolType: 0
