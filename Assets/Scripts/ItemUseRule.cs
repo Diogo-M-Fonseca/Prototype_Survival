@@ -20,6 +20,12 @@ public class ItemUseRule
     [SerializeField] private bool _consumeItem = true;
 
     /// <summary>
+    /// Mensagem mostrada no retículo quando o jogador aponta para o alvo com um item que esta regra aceita (ex.: "fill bottle").
+    /// Se vazia, usa-se "use {nome do item}".
+    /// </summary>
+    [SerializeField] private string _usePrompt;
+
+    /// <summary>
     /// Evento disparado quando o item é usado; recebe quem o usou (ex.: abrir uma porta).
     /// </summary>
     [SerializeField] private UnityEvent<GameObject> _onUsed;
@@ -38,6 +44,11 @@ public class ItemUseRule
     /// Se o item é gasto.
     /// </summary>
     public bool ConsumeItem => _consumeItem;
+
+    /// <summary>
+    /// Mensagem do retículo (pode ser vazia).
+    /// </summary>
+    public string UsePrompt => _usePrompt;
 
     /// <summary>
     /// Evento de uso.
