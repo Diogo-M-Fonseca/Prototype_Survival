@@ -4135,6 +4135,7 @@ MonoBehaviour:
   _prompt: Craft
   _canInteract: 1
   _menu: {fileID: 1876605534}
+  _secondInventory: {fileID: 67639179}
   _recipes:
   - {fileID: 11400000, guid: 1b5c871b79a180c4a86cb47aeb654a69, type: 2}
 --- !u!1 &715591848
@@ -5296,7 +5297,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCrafting
   _crafting: {fileID: 1876605534}
-  _bagToggle: {fileID: 0}
+  _bagToggle: {fileID: 971059305}
+  _logSync: 0
 --- !u!1 &973878763
 GameObject:
   m_ObjectHideFlags: 0
