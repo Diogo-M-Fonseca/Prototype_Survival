@@ -50,6 +50,18 @@ public class ItemTarget : MonoBehaviour, IItemTarget
     }
 
     /// <summary>
+    /// Mensagem do reticle para o item, se houver uma regra para ele.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public string GetUsePrompt(Item item, GameObject user)
+    {
+        return FindRule(item)?.UsePrompt;
+    }
+
+
+    /// <summary>
     /// Dispara o evento da regra aplicada.
     /// </summary>
     public void OnItemUsed(Item item, GameObject user)

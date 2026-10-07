@@ -25,6 +25,11 @@ public class HotbarController : MonoBehaviour
     [SerializeField] private PlayerInteraction _interaction;
 
     /// <summary>
+    /// Grupo de bindings usado para mostrar o nome da tecla em uso
+    /// </summary>
+    [SerializeField] private string _bindingGroup = "Keyboard&Mouse";
+
+    /// <summary>
     /// Ação de input para selecionar um slot (teclas 1..N).
     /// </summary>
     private InputAction _selectAction;
@@ -125,6 +130,37 @@ public class HotbarController : MonoBehaviour
 
         // Sem alvo ou o item não faz nada com ele: uso normal
         _inventory.UseSlot(_selected, gameObject);
+    }
+
+    /// <summary>
+    /// Indica se o item selecionado tem efeito sobre o que está sob a mira
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="prompt"></param>
+    /// <returns>Tecla e a mensagem para mostrar no retículo.</returns>
+    public bool TryGetUsePrompt(out string key, out string prompt)
+    {
+        key = null;
+        prompt = null;
+
+        if (BagOpen || _selected < 0 || _interaction == null) return false;
+
+        ItemStack stack = _inventory[_selected];
+        Collider looked = _interaction.LookedCollider;
+        if (stack.IsEmpty || looked == null) return false;
+
+        IItemTarget target = looked.GetComponentInParent<IItemTarget>();
+        if (target == null || !target.CanReceive(stack.Item, gameObject, out _)) return false;
+
+        prompt = target.GetUsePrompt(stack.Item, gameObject);
+        if (string.IsNullOrEmpty(prompt)) prompt = "use " + stack.Item.DisplayName;
+
+        key = _useAction.GetBindingDisplayString(
+            InputBinding.DisplayStringOptions.DontIncludeInteractions,
+            string.IsNullOrEmpty(_bindingGroup) ? null : _bindingGroup);
+        if (string.IsNullOrEmpty(key)) key = "Click";
+
+        return true;
     }
 
     /// <summary>

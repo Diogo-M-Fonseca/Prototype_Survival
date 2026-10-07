@@ -1067,6 +1067,7 @@ MonoBehaviour:
   - _requiredTag: {fileID: 11400000, guid: 86bdb42b03504314c85b22e65329a401, type: 2}
     _result: {fileID: 11400000, guid: de299aad265f24a4cb2b93029f514d61, type: 2}
     _consumeItem: 1
+    _usePrompt: 
     _onUsed:
       m_PersistentCalls:
         m_Calls: []
@@ -1472,11 +1473,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractionPromptUi
   _interaction: {fileID: 971059306}
+  _hotbar: {fileID: 971059304}
   _promptText: {fileID: 199783027}
   _format: '{0} to {1}'
   _reticle: {fileID: 0}
   _idleColor: {r: 1, g: 1, b: 1, a: 1}
-  _ActiveColor: {r: 0, g: 1, b: 0, a: 1}
+  _activeColor: {r: 0, g: 1, b: 0, a: 1}
   _activeScale: 1.5
 --- !u!1 &215629235
 GameObject:
@@ -4977,6 +4979,7 @@ MonoBehaviour:
   _hotbarUI: {fileID: 2096574916}
   _bagToggle: {fileID: 971059305}
   _interaction: {fileID: 971059306}
+  _bindingGroup: Keyboard&Mouse
 --- !u!114 &971059305
 MonoBehaviour:
   m_ObjectHideFlags: 0
