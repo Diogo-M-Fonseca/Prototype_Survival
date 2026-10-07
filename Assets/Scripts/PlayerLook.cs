@@ -11,7 +11,7 @@ public class PlayerLook : MonoBehaviour
 
     private void Update()
     {
-        if (_bagToggle.IsOpen) return;
+        if (CraftingMenu.AnyOpen || (_bagToggle != null && _bagToggle.IsOpen)) return;
         if (Mouse.current == null) return;
 
         Vector2 delta = Mouse.current.delta.ReadValue() * _mouseSensitivity;

@@ -127,5 +127,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
   _prompt: 
   _canInteract: 1
-  _item: {fileID: 11400000, guid: 1715184972d94164e86e49651bdf8d7b, type: 2}
+  _item: {fileID: 11400000, guid: 78d9abb236391b343b1bb6d530fabce2, type: 2}
   _amount: 1
