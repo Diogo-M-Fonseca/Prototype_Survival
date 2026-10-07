@@ -22,3 +22,5 @@ MonoBehaviour:
   _leftoverItem: {fileID: 0}
   _tags: []
   _toolType: 0
+  _canAttack: 1
+  _attackPower: 10

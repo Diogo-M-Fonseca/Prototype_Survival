@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class HotbarController : MonoBehaviour
 {
     /// <summary>
-    /// Inventário de onde os itens são usados.
+    /// Inventï¿½rio de onde os itens sï¿½o usados.
     /// </summary>
     [SerializeField] private Inventory _inventory;
 
@@ -15,12 +15,12 @@ public class HotbarController : MonoBehaviour
     [SerializeField] private InventoryGridUI _hotbarUI;
 
     /// <summary>
-    /// Toggle da mochila; com a mochila aberta a hotbar não responde.
+    /// Toggle da mochila; com a mochila aberta a hotbar nï¿½o responde.
     /// </summary>
     [SerializeField] private InventoryToggle _bagToggle;
 
     /// <summary>
-    /// Interação do jogador; indica o que está sob a mira (usado para usar itens sobre o mundo).
+    /// Interaï¿½ï¿½o do jogador; indica o que estï¿½ sob a mira (usado para usar itens sobre o mundo).
     /// </summary>
     [SerializeField] private PlayerInteraction _interaction;
 
@@ -30,12 +30,12 @@ public class HotbarController : MonoBehaviour
     [SerializeField] private string _bindingGroup = "Keyboard&Mouse";
 
     /// <summary>
-    /// Ação de input para selecionar um slot (teclas 1..N).
+    /// Aï¿½ï¿½o de input para selecionar um slot (teclas 1..N).
     /// </summary>
     private InputAction _selectAction;
 
     /// <summary>
-    /// Ação de input para usar o item selecionado.
+    /// Aï¿½ï¿½o de input para usar o item selecionado.
     /// </summary>
     private InputAction _useAction;
 
@@ -50,12 +50,12 @@ public class HotbarController : MonoBehaviour
     public int Selected => _selected;
 
     /// <summary>
-    /// Disparado sempre que a seleção muda; o argumento é o novo índice
+    /// Disparado sempre que a seleï¿½ï¿½o muda; o argumento ï¿½ o novo ï¿½ndice
     /// </summary>
     public event Action<int> SelectionChanged;
 
     /// <summary>
-    /// Indica se a mochila existe e está aberta.
+    /// Indica se a mochila existe e estï¿½ aberta.
     /// </summary>
     private bool BagOpen => _bagToggle != null && _bagToggle.IsOpen;
 
@@ -91,12 +91,12 @@ public class HotbarController : MonoBehaviour
         if (BagOpen) return;
         if (Mouse.current == null || _hotbarUI.SlotCount == 0) return;
 
-        // Sem movimento da roda não há nada a fazer
+        // Sem movimento da roda nï¿½o hï¿½ nada a fazer
         float scroll = Mouse.current.scroll.ReadValue().y;
         if (Mathf.Approximately(scroll, 0f)) return;
 
-        // Se nada estava selecionado, começa no primeiro (scroll para cima) ou no último (para baixo);
-        // caso contrário avança/recua com wrap-around
+        // Se nada estava selecionado, comeï¿½a no primeiro (scroll para cima) ou no ï¿½ltimo (para baixo);
+        // caso contrï¿½rio avanï¿½a/recua com wrap-around
         int direction = scroll > 0f ? 1 : -1;
         int next = _selected < 0
             ? (direction > 0 ? 0 : _hotbarUI.SlotCount - 1)
@@ -106,38 +106,53 @@ public class HotbarController : MonoBehaviour
     }
 
     /// <summary>
-    /// Seleção por tecla: o índice vem da posição do binding premido.
+    /// Seleï¿½ï¿½o por tecla: o ï¿½ndice vem da posiï¿½ï¿½o do binding premido.
     /// </summary>
     private void OnSelect(InputAction.CallbackContext ctx)
     {
         int index = ctx.action.GetBindingIndexForControl(ctx.control);
         if (index < 0 || index >= _hotbarUI.SlotCount) return;
 
-        // Premir a tecla do slot já selecionado desseleciona-o
+        // Premir a tecla do slot jï¿½ selecionado desseleciona-o
         Select(_selected == index ? -1 : index);
     }
 
     /// <summary>
-    /// Usa o item do slot selecionado: primeiro sobre o que está sob a mira (ex.: chave numa porta), se isso não tiver efeito, normalmente (ex.: beber).
+    /// Usa o item do slot selecionado: primeiro sobre o que estï¿½ sob a mira (ex.: chave numa porta), se isso nï¿½o tiver efeito, normalmente (ex.: beber).
     /// </summary>
     private void OnUse(InputAction.CallbackContext ctx)
     {
         if (BagOpen || _selected < 0) return;
 
-        // Objeto que o jogador está a olhar (null se nada)
+        // Objeto que o jogador estï¿½ a olhar (null se nada)
         Collider looked = _interaction != null ? _interaction.LookedCollider : null;
+        if (looked != null && TryAttackWithCrowbar(looked)) return;
+
         if (looked != null && _inventory.UseSlotOn(_selected, gameObject, looked.gameObject)) return;
 
-        // Sem alvo ou o item não faz nada com ele: uso normal
+        // Sem alvo ou o item nï¿½o faz nada com ele: uso normal
         _inventory.UseSlot(_selected, gameObject);
     }
 
+    private bool TryAttackWithCrowbar(Collider targetCollider)
+    {
+        ItemStack stack = _inventory[_selected];
+        if (stack.IsEmpty || !(stack.Item is Tools tool)) return false;
+        if (tool.ToolType != ToolTypes.Crowbar || !tool.CanAttack) return false;
+
+        IDestroyable target = targetCollider.GetComponentInParent<IDestroyable>();
+        if (target == null) return false;
+
+        target.TakeDamage(tool.AttackPower);
+        return true;
+    }
+
     /// <summary>
-    /// Indica se o item selecionado tem efeito sobre o que está sob a mira
+    /// Indica se o item selecionado tem efeito sobre o que estï¿½ sob a mira
     /// </summary>
     /// <param name="key"></param>
     /// <param name="prompt"></param>
-    /// <returns>Tecla e a mensagem para mostrar no retículo.</returns>
+    /// <returns>Tecla e a mensagem para mostrar no retï¿½culo.</returns>
     public bool TryGetUsePrompt(out string key, out string prompt)
     {
         key = null;
