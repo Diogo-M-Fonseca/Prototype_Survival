@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8230412056343960161}
   - component: {fileID: 4358413716747366242}
   m_Layer: 0
-  m_Name: Water Bottle
+  m_Name: Alcool Bottle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -129,5 +129,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
   _prompt: 
   _canInteract: 1
-  _item: {fileID: 11400000, guid: de299aad265f24a4cb2b93029f514d61, type: 2}
+  _item: {fileID: 11400000, guid: f3bc73cac42bb04489779bf9e2a89832, type: 2}
   _amount: 1

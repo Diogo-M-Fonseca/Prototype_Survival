@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14e4e361f83b8f344992c10db59fdd86, type: 3}
+  m_Name: BandageRecepie
+  m_EditorClassIdentifier: Assembly-CSharp::ItemRecipe
+  _displayName: Bandage
+  _description: Heal from damage
+  _ingredients:
+  - item: {fileID: 11400000, guid: f3bc73cac42bb04489779bf9e2a89832, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 78d9abb236391b343b1bb6d530fabce2, type: 2}
+    amount: 3
+  _results:
+  - item: {fileID: 11400000, guid: 1c4e3e758e7d60d4aa53d84a65bea4c8, type: 2}
+    amount: 1

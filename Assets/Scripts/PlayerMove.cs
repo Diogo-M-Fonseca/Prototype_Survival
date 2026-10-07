@@ -22,6 +22,8 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
+        if (CraftingMenu.AnyOpen) return;
+
         Vector2 moveInput = _moveAction.ReadValue<Vector2>();
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         move = Vector3.ClampMagnitude(move, 1f);

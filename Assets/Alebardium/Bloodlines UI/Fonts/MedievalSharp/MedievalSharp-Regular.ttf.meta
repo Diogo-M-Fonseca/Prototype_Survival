@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: de2a7e66419fb574d8202282964aa74d
+guid: a2103f9521c8f3b46a062d5fb59a12d4
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -19,10 +19,3 @@ TrueTypeFontImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 328721
-  packageName: Bloodlines - Dark UI
-  packageVersion: 1.0.1
-  assetPath: Assets/Alebardium/Bloodlines UI/Fonts/MedievalSharp/MedievalSharp-Regular.ttf
-  uploadId: 936906

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: b0f430c1fd46319499a10af2b0496b67
+guid: df1a4d103c9ebbf4baeaacf0dc49769f
 AudioImporter:
   externalObjects: {}
   serializedVersion: 8
@@ -8,7 +8,7 @@ AudioImporter:
     loadType: 0
     sampleRateSetting: 0
     sampleRateOverride: 44100
-    compressionFormat: 0
+    compressionFormat: 1
     quality: 1
     conversionMode: 0
     preloadAudioData: 0
@@ -21,10 +21,3 @@ AudioImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 328721
-  packageName: Bloodlines - Dark UI
-  packageVersion: 1.0.1
-  assetPath: Assets/Alebardium/Bloodlines UI/Audio/Hover Button SFX.wav
-  uploadId: 936906
