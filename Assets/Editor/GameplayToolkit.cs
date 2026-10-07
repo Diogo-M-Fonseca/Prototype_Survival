@@ -2,7 +2,7 @@
 // Instalar: colocar numa pasta chamada "Editor" (ex.: Assets/Editor/GameplayToolkit.cs).
 // Abrir:    menu Tools > Gameplay Toolkit
 //
-// Cria itens (FoodsAndDrinks / OtherItems), tags, receitas, pickups, storages e ItemTargets
+// Cria itens (FoodsAndDrinks / OtherItems), tags, receitas, pickups, storages, ItemTargets e zombies (ZombieAI)
 // com regras, tudo a partir de linhas de texto, sem andar a preencher o Inspector campo a campo.
 
 using System;
@@ -141,7 +141,7 @@ EmptyBottle | consume=true | result=Water Bottle | msg=fill bottle
 
     private void OnGUI()
     {
-        _tab = GUILayout.Toolbar(_tab, new[] { "Itens", "Receitas", "Mundo" }, GUILayout.Height(24));
+        _tab = GUILayout.Toolbar(_tab, new[] { "Itens", "Receitas", "Mundo", "Zombie" }, GUILayout.Height(24));
         _textMode = GUILayout.Toolbar(_textMode ? 1 : 0, new[] { "Formulário", "Texto" }) == 1;
         EditorGUILayout.Space(4);
 
@@ -150,7 +150,8 @@ EmptyBottle | consume=true | result=Water Bottle | msg=fill bottle
         {
             case 0: if (_textMode) DrawItemsTab(); else DrawItemForm(); break;
             case 1: if (_textMode) DrawRecipesTab(); else DrawRecipeForm(); break;
-            default: DrawWorldTab(); break;
+            case 2: DrawWorldTab(); break;
+            default: DrawZombieTab(); break;
         }
         EditorGUILayout.EndScrollView();
 
