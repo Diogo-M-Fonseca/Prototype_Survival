@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+using UnityEngine.InputSystem;
+#endif
+
 
 public class CraftingMenu : MonoBehaviour
 {
@@ -28,6 +32,9 @@ public class CraftingMenu : MonoBehaviour
     [Tooltip("Pára o jogo (Time.timeScale = 0) enquanto o menu está aberto.")]
     [SerializeField] private bool _pauseGame = true;
 
+    [Tooltip("Fecha o menu ao carregar em Tab.")]
+    [SerializeField] private bool _closeOnTab = true;
+
     private readonly List<Recipe> _valid = new List<Recipe>();
 
     private UIPanel _panel;
@@ -42,16 +49,24 @@ public class CraftingMenu : MonoBehaviour
     private bool _previousVisible;
     private float _previousTimeScale = 1f;
 
+    private static int _lastClosedFrame = -1;
+
     public event Action<Recipe> Crafted;
 
- 
+
     public event Action<bool> VisibilityChanged;
 
     public static bool AnyOpen { get; private set; }
 
+    /// <summary>
+    /// True enquanto algum menu está aberto OU no frame em que foi fechado.
+    /// Usa isto nos outros scripts (ex.: inventário com Tab) para ignorarem o input.
+    /// </summary>
+    public static bool BlockingInput => AnyOpen || _lastClosedFrame == Time.frameCount;
+
     public bool IsOpen => _panel != null && _panel.IsVisible;
 
-  
+
     public bool ManageCursor
     {
         get => _manageCursor;
@@ -64,7 +79,15 @@ public class CraftingMenu : MonoBehaviour
 
         Build();
         _panel.SetVisible(false, true);
-        _panel.VisibilityChanged += OnVisibilityChanged; 
+        _panel.VisibilityChanged += OnVisibilityChanged;
+    }
+
+    private void Update()
+    {
+        if (!_open || !_closeOnTab) return;
+
+        if (TabPressed())
+            Close();
     }
 
     private void OnDisable()
@@ -118,12 +141,22 @@ public class CraftingMenu : MonoBehaviour
         _panel.Hide();
         ApplyOpenState(false);
     }
+
     public void Refresh()
     {
         if (!_open) return;
 
         _list.Refresh();
         UpdateDetails(_list.SelectedIndex);
+    }
+
+    private static bool TabPressed()
+    {
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+        return Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame;
+#else
+        return Input.GetKeyDown(KeyCode.Tab);
+#endif
     }
 
     private void OnVisibilityChanged(bool visible)
@@ -140,6 +173,7 @@ public class CraftingMenu : MonoBehaviour
         if (_open == open) return;
         _open = open;
         AnyOpen = open;
+        if (!open) _lastClosedFrame = Time.frameCount;
 
         if (_pauseGame)
         {

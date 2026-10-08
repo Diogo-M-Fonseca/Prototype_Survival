@@ -43,12 +43,19 @@ public class InventoryToggle : MonoBehaviour
     /// Garante que o jogo começa com a mochila fechada.
     /// </summary>
     private void Start() => SetOpen(false);
-    
+
     /// <summary>
     /// Inverte o estado ao premir a tecla.
     /// </summary>
     /// <param name="ctx"></param>
-    private void OnToggle(InputAction.CallbackContext ctx) => SetOpen(!IsOpen);
+    private void OnToggle(InputAction.CallbackContext ctx)
+    {
+        // Se o menu de crafting acabou de fechar neste frame (ex.: com a mesma tecla)
+        // e já fechou a mochila, ignora o input para não a reabrir.
+        if (!IsOpen && CraftingMenu.BlockingInput) return;
+
+        SetOpen(!IsOpen);
+    }
 
     /// <summary>
     /// Abre a mochila.
@@ -66,6 +73,7 @@ public class InventoryToggle : MonoBehaviour
     /// <param name="open"></param>
     private void SetOpen(bool open)
     {
+        Debug.Log($"[Bag] SetOpen({open}) frame {Time.frameCount}\n{StackTraceUtility.ExtractStackTrace()}");
         // Atualiza o estado interno.
         IsOpen = open;
 
