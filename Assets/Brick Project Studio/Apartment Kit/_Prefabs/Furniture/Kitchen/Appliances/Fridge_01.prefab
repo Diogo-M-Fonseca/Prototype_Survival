@@ -1986,9 +1986,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e8192f35a44301488ec0f072d9a16fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prompt: 
+  _canInteract: 1
   openandclose: {fileID: 1133900640}
   open: 0
-  Player: {fileID: 0}
 --- !u!1 &5743441568381836945
 GameObject:
   m_ObjectHideFlags: 0
@@ -3142,9 +3143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b5e0617227fa4743be84f23d9e5cb42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prompt: 
+  _canInteract: 1
   openandclose1: {fileID: 217220886}
   open: 0
-  Player: {fileID: 0}
 --- !u!1 &7630520031127733399
 GameObject:
   m_ObjectHideFlags: 0
