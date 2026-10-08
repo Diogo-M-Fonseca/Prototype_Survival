@@ -6824,7 +6824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cbe789864b467642a7dfeda61fc9bdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
-  mainGameSceneName: 
+  mainGameSceneName: Apt_PlaceHolder
 --- !u!4 &582701555
 Transform:
   m_ObjectHideFlags: 0

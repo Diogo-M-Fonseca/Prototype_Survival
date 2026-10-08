@@ -48,6 +48,16 @@ public abstract class Item : ScriptableObject
     [SerializeField] private ItemTag[] _tags;
 
     /// <summary>
+    /// Som tocado quando o item é usado com sucesso (comer, beber, aplicar ligadura...).
+    /// </summary>
+    [SerializeField] private AudioClip _useSound;
+
+    /// <summary>
+    /// Volume do som de uso.
+    /// </summary>
+    [SerializeField, Range(0f, 1f)] private float _useSoundVolume = 1f;
+
+    /// <summary>
     /// Ícone já resolvido (cache, para não o gerar de novo todas as vezes).
     /// </summary>
     private Sprite _resolvedIcon;
@@ -115,6 +125,16 @@ public abstract class Item : ScriptableObject
             if (t == tag) return true;
 
         return false;
+    }
+
+    /// <summary>
+    /// Toca o som de uso do item (se tiver) na posição de quem o usou.
+    /// </summary>
+    /// <param name="user">Quem usou o item.</param>
+    public void PlayUseSound(GameObject user)
+    {
+        if (_useSound == null || user == null) return;
+        AudioSource.PlayClipAtPoint(_useSound, user.transform.position, _useSoundVolume);
     }
 
     /// <summary>

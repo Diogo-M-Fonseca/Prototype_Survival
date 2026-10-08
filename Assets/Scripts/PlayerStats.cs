@@ -7,18 +7,13 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int _currentHunger = 100;
     [SerializeField] private int _currentThirst = 100;
 
-    [Tooltip("Pontos de fome perdidos por segundo.")]
     [SerializeField] private float _hungerDecreaseRate = 2f;
-    [Tooltip("Pontos de sede perdidos por segundo.")]
     [SerializeField] private float _thirstDecreaseRate = 2.5f;
     [SerializeField] private float _starvationDamageRate = 3f;
-    [SerializeField] private GameObject _gameOverMenu;
-    [SerializeField] private Behaviour[] _playerControlScripts;
 
     private float _hungerDrain;
     private float _thirstDrain;
     private float _starvationTimer;
-    private bool _hasDied;
 
     public int MaxHealth => _maxHealth;
     public int CurrentHealth => _currentHealth;
@@ -28,16 +23,6 @@ public class PlayerStats : MonoBehaviour
     private void Awake()
     {
         _currentHealth = _maxHealth;
-
-        if (_gameOverMenu == null)
-        {
-            _gameOverMenu = GameObject.Find("GameOverMenu");
-        }
-
-        if (_gameOverMenu != null)
-        {
-            _gameOverMenu.SetActive(false);
-        }
     }
 
     private void Update()
@@ -61,11 +46,6 @@ public class PlayerStats : MonoBehaviour
         {
             _starvationTimer = 0f;
         }
-
-        if (!_hasDied && _currentHealth <= 0)
-        {
-            Death();
-        }
     }
 
     private static int Drain(ref float accumulator, float ratePerSecond)
@@ -76,7 +56,7 @@ public class PlayerStats : MonoBehaviour
         return whole;
     }
 
-    private void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         _currentHealth -= damage;
         if (_currentHealth <= 0)
@@ -107,37 +87,5 @@ public class PlayerStats : MonoBehaviour
 
         _currentThirst = Mathf.Min(_currentThirst + thirstAmount, 100);
         return true;
-    }
-
-    private void Death()
-    {
-        _hasDied = true;
-
-        if (_gameOverMenu == null)
-        {
-            Debug.LogError("Game Over Menu is not assigned on PlayerStats.", this);
-        }
-        else
-        {
-            _gameOverMenu.SetActive(true);
-        }
-
-        Behaviour[] controlScripts = _playerControlScripts;
-        if (controlScripts == null || controlScripts.Length == 0)
-        {
-            controlScripts = GetComponents<Behaviour>();
-        }
-
-        foreach (Behaviour playerControlScript in controlScripts)
-        {
-            if (playerControlScript != null && playerControlScript != this)
-            {
-                playerControlScript.enabled = false;
-            }
-        }
-
-        Time.timeScale = 0f;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 }

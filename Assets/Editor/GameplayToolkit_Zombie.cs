@@ -16,6 +16,8 @@ public partial class GameplayToolkit
 
     [SerializeField] private string _zArea = "Corridor";
 
+    [SerializeField] private GameObject _zPrefab;
+
     [SerializeField, Min(0.1f)] private float _zRadius = 0.4f;
     [SerializeField, Min(0.5f)] private float _zHeight = 1.8f;
     [SerializeField, Min(0f)] private float _zEyesHeight = 1.6f;
@@ -56,6 +58,10 @@ public partial class GameplayToolkit
         // ---- Zombie
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField("2. Zombie", EditorStyles.boldLabel);
+        _zPrefab = (GameObject)EditorGUILayout.ObjectField(
+            new GUIContent("Prefab / modelo", "Prefab (ou modelo) do zombie, com o visual e o Animator. Vazio = cápsula de teste."),
+            _zPrefab, typeof(GameObject), false);
+        EditorGUILayout.Space(2);
 
         EditorGUILayout.LabelField("Corpo", EditorStyles.miniBoldLabel);
         _zRadius = Mathf.Max(0.1f, EditorGUILayout.FloatField("Raio", _zRadius));
@@ -226,16 +232,28 @@ public partial class GameplayToolkit
         int area = EnsureCorridorArea();
         if (area < 0) return;
 
-        // Raiz nos pés (o NavMeshAgent assenta a raiz no chão); a cápsula é só visual
-        var root = new GameObject("Zombie");
-        Undo.RegisterCreatedObjectUndo(root, "Criar zombie");
+        GameObject root;
+        if (_zPrefab != null)
+        {
+            // Usa o prefab/modelo do projeto, com o visual e as animações dele
+            root = (GameObject)PrefabUtility.InstantiatePrefab(_zPrefab);
+            Undo.RegisterCreatedObjectUndo(root, "Criar zombie");
+        }
+        else
+        {
+            // Raiz nos pés (o NavMeshAgent assenta a raiz no chão); a cápsula é só visual
+            root = new GameObject("Zombie");
+            Undo.RegisterCreatedObjectUndo(root, "Criar zombie");
 
-        GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        visual.name = "Visual";
-        Object.DestroyImmediate(visual.GetComponent<Collider>());
-        visual.transform.SetParent(root.transform, false);
-        visual.transform.localPosition = new Vector3(0f, _zHeight * 0.5f, 0f);
-        visual.transform.localScale = new Vector3(_zRadius * 2f, _zHeight * 0.5f, _zRadius * 2f);
+            GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            visual.name = "Visual";
+            Object.DestroyImmediate(visual.GetComponent<Collider>());
+            visual.transform.SetParent(root.transform, false);
+            visual.transform.localPosition = new Vector3(0f, _zHeight * 0.5f, 0f);
+            visual.transform.localScale = new Vector3(_zRadius * 2f, _zHeight * 0.5f, _zRadius * 2f);
+
+            Warn("Sem prefab: criei uma cápsula de teste. Arrasta o prefab do zombie para o campo 'Prefab / modelo'.");
+        }
 
         // Põe-o no corredor mais perto do centro da vista da cena
         Vector3 pos = SceneView.lastActiveSceneView != null ? SceneView.lastActiveSceneView.pivot : Vector3.zero;
@@ -274,6 +292,25 @@ public partial class GameplayToolkit
         agent.stoppingDistance = 0.3f;
         agent.areaMask = 1 << area;
         EditorUtility.SetDirty(agent);
+
+        // ---- Animator: quem move o zombie é o NavMeshAgent, por isso o root motion tem de estar desligado
+        Animator animator = go.GetComponentInChildren<Animator>(true);
+        if (animator == null)
+        {
+            Warn($"{go.name}: não tem Animator; o zombie não terá animações.");
+        }
+        else
+        {
+            if (animator.runtimeAnimatorController == null)
+                Warn($"{go.name}: o Animator não tem Controller (precisa dos parâmetros Speed e Attack).");
+
+            if (animator.applyRootMotion)
+            {
+                animator.applyRootMotion = false;
+                EditorUtility.SetDirty(animator);
+                Ok($"{go.name}: root motion desligado no Animator.");
+            }
+        }
 
         // ---- olhos (origem da visão)
         Transform eyes = FindDeep(go.transform, "Eyes");

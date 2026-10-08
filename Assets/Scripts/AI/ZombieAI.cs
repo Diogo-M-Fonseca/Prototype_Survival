@@ -51,12 +51,37 @@ public class ZombieAI : MonoBehaviour
     [Tooltip("Distância a que o zombie pára junto ao jogador.")]
     [SerializeField, Min(0.1f)] private float _stopDistance = 1.2f;
 
+    [Header("Som")]
+    [Tooltip("AudioSource da voz do zombie. Se vazio, é criado um automaticamente.")]
+    [SerializeField] private AudioSource _voice;
+
+    [Tooltip("Sons tocados ao acaso, um de cada vez, enquanto passeia.")]
+    [SerializeField] private AudioClip[] _casualClips;
+
+    [Tooltip("Som em loop enquanto persegue o jogador.")]
+    [SerializeField] private AudioClip _chaseClip;
+
+    [SerializeField, Range(0f, 1f)] private float _voiceVolume = 1f;
+
+    [Tooltip("Distância a partir da qual o som deixa de se ouvir.")]
+    [SerializeField, Min(1f)] private float _voiceMaxDistance = 25f;
+
+    [Tooltip("Pausa mínima e máxima (s) entre sons de passeio.")]
+    [SerializeField, Min(0f)] private float _casualGapMin = 3f;
+    [SerializeField, Min(0f)] private float _casualGapMax = 8f;
+
     [Header("Ataque")]
     [Tooltip("Margem extra à distância de paragem dentro da qual o zombie ataca.")]
     [SerializeField, Min(0f)] private float _attackRangeMargin = 0.3f;
 
     [Tooltip("Segundos entre ataques.")]
     [SerializeField, Min(0.1f)] private float _attackCooldown = 1.5f;
+
+    [Tooltip("Dano causado ao jogador em cada golpe.")]
+    [SerializeField, Min(0)] private int _attackDamage = 10;
+
+    [Tooltip("Segundos entre o início do ataque e o momento em que o golpe acerta (ajusta ao clip de ataque).")]
+    [SerializeField, Min(0f)] private float _attackHitDelay = 0.4f;
 
     [Tooltip("Velocidade com que o zombie se vira para o jogador ao atacar.")]
     [SerializeField, Min(0f)] private float _attackTurnSpeed = 10f;
@@ -66,6 +91,10 @@ public class ZombieAI : MonoBehaviour
     [SerializeField] private Animator _animator;
 
     [SerializeField, Min(0f)] private float _speedDampTime = 0.1f;
+
+    [Header("Depuração")]
+    [Tooltip("Com o zombie selecionado na Scene View (em Play) mostra estado, velocidades e distância.")]
+    [SerializeField] private bool _showDebug = true;
 
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int AttackHash = Animator.StringToHash("Attack");
@@ -81,7 +110,15 @@ public class ZombieAI : MonoBehaviour
     private float _waitTimer;
     private float _repathTimer;
     private float _nextAttackTime;
+    private float _pendingHitTime = -1f;
+    private PlayerStats _targetStats;
+    private Vector3 _lastVisualPos;
+    private float _visualSpeed;
+    private bool _dbgSees;
+    private bool _dbgInCorridor;
     private bool _waiting;
+    private float _nextCasualTime;
+    private int _lastCasual = -1;
 
     private readonly RaycastHit[] _hits = new RaycastHit[16];
 
@@ -95,6 +132,7 @@ public class ZombieAI : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
         _path = new NavMeshPath();
         if (_eyes == null) _eyes = transform;
+        SetupVoice();
         if (_animator == null) _animator = GetComponentInChildren<Animator>();
 
         int area = NavMesh.GetAreaFromName(_corridorArea);
@@ -107,6 +145,7 @@ public class ZombieAI : MonoBehaviour
 
         _areaMask = 1 << area;
         _agent.areaMask = _areaMask; // o zombie só consegue andar nesta área
+        SanitizeMovement();
     }
 
     private void Start()
@@ -125,6 +164,9 @@ public class ZombieAI : MonoBehaviour
         }
 
         _targetController = _target.GetComponentInChildren<CharacterController>();
+        _targetStats = _target.GetComponentInParent<PlayerStats>();
+        if (_targetStats == null) _targetStats = FindFirstObjectByType<PlayerStats>();
+        if (_targetStats == null) Debug.LogWarning("ZombieAI: não foi encontrado o PlayerStats; o zombie não causa dano.", this);
 
         // Se o zombie nasceu fora do corredor, encosta-o ao corredor mais próximo
         if (!_agent.isOnNavMesh && NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 3f, _areaMask))
@@ -136,12 +178,16 @@ public class ZombieAI : MonoBehaviour
     private void Update()
     {
         UpdateAnimator();
+        UpdateVoice();
+        UpdateAttackHit();
+        TrackVisualSpeed();
 
         if (!_agent.isOnNavMesh) return;
 
         // O jogador só conta se os seus pés estiverem no corredor
         bool inCorridor = TryGetPlayerCorridorPos(out Vector3 playerNavPos);
         bool sees = inCorridor && CanSeePlayer();
+        _dbgInCorridor = inCorridor;
 
         if (_state == State.Wander) UpdateWander(sees, playerNavPos);
         else UpdateChase(inCorridor, sees, playerNavPos);
@@ -155,6 +201,60 @@ public class ZombieAI : MonoBehaviour
 
         // Velocidade real do agent (0 parado, ~walk a passear, ~run a perseguir)
         _animator.SetFloat(SpeedHash, _agent.velocity.magnitude, _speedDampTime, Time.deltaTime);
+    }
+
+    // ---------- Som ----------
+
+    private void SetupVoice()
+    {
+        if (_voice == null) _voice = GetComponent<AudioSource>();
+        if (_voice == null) _voice = gameObject.AddComponent<AudioSource>();
+
+        _voice.playOnAwake = false;
+        _voice.spatialBlend = 1f; // som 3D: ouve-se de onde o zombie está
+        _voice.rolloffMode = AudioRolloffMode.Linear;
+        _voice.minDistance = 2f;
+        _voice.maxDistance = _voiceMaxDistance;
+        _voice.volume = _voiceVolume;
+    }
+
+    private void OnStartChaseVoice()
+    {
+        if (_voice == null || _chaseClip == null) return;
+
+        _voice.Stop();
+        _voice.clip = _chaseClip;
+        _voice.loop = true;
+        _voice.Play();
+    }
+
+    private void OnStartWanderVoice()
+    {
+        if (_voice == null) return;
+
+        _voice.Stop();
+        _voice.loop = false;
+        _nextCasualTime = Time.time + Random.Range(_casualGapMin, _casualGapMax);
+    }
+
+    private void UpdateVoice()
+    {
+        if (_voice == null || _state != State.Wander) return;
+        if (_casualClips == null || _casualClips.Length == 0) return;
+        if (_voice.isPlaying || Time.time < _nextCasualTime) return;
+
+        // Escolhe um som ao acaso, evitando repetir o último
+        int index = Random.Range(0, _casualClips.Length);
+        if (_casualClips.Length > 1 && index == _lastCasual) index = (index + 1) % _casualClips.Length;
+        _lastCasual = index;
+
+        AudioClip clip = _casualClips[index];
+        if (clip == null) return;
+
+        _voice.clip = clip;
+        _voice.loop = false;
+        _voice.Play();
+        _nextCasualTime = Time.time + clip.length + Random.Range(_casualGapMin, _casualGapMax);
     }
 
     // ---------- Passeio ----------
@@ -190,6 +290,9 @@ public class ZombieAI : MonoBehaviour
         _state = State.Wander;
         _agent.speed = _walkSpeed;
         _agent.stoppingDistance = 0.3f;
+        _agent.isStopped = false;
+        _agent.autoBraking = true;
+        OnStartWanderVoice();
         _waiting = false;
         PickNewWanderDestination();
     }
@@ -231,7 +334,15 @@ public class ZombieAI : MonoBehaviour
             return;
         }
 
-        if (sees)
+        // Perto do jogador o zombie sente-o mesmo fora do campo de visão
+        // (senão não se virava para ele e acabava por desistir ao chegar)
+        float flat = FlatDistanceToTarget();
+        float attackRange = _stopDistance + _attackRangeMargin;
+        bool near = flat <= attackRange;
+        bool aware = sees || near;
+        _dbgSees = aware;
+
+        if (aware)
         {
             _timeSinceSeen = 0f;
             _lastKnownPos = playerNavPos;
@@ -252,15 +363,20 @@ public class ZombieAI : MonoBehaviour
             }
         }
 
-        // Ataque: perto do jogador e a vê-lo
-        TryAttack(sees);
+        // Pára quando está ao alcance e só volta a andar quando o jogador se afasta um pouco
+        // (a histerese evita arrancar e travar de cada vez que o jogador mexe)
+        if (near) _agent.isStopped = true;
+        else if (flat > attackRange + 0.3f) _agent.isStopped = false;
 
-        // Atualiza o destino a cada 0.1 s em vez de todos os frames
+        TryAttack(aware);
+
+        // Só pede um caminho novo se o jogador se moveu (verifica a cada 0.2 s)
         _repathTimer -= Time.deltaTime;
         if (_repathTimer <= 0f)
         {
-            _repathTimer = 0.1f;
-            _agent.SetDestination(_lastKnownPos);
+            _repathTimer = 0.2f;
+            if (!_agent.isStopped && (!_agent.hasPath || (_agent.destination - _lastKnownPos).sqrMagnitude > 0.09f))
+                _agent.SetDestination(_lastKnownPos);
         }
 
         // Caminho impossível (ex.: jogador num corredor desligado): desiste
@@ -273,6 +389,9 @@ public class ZombieAI : MonoBehaviour
         _state = State.Chase;
         _agent.speed = _runSpeed;
         _agent.stoppingDistance = _stopDistance;
+        _agent.isStopped = false;
+        _agent.autoBraking = false; // trava-se à mão em UpdateChase, sem abrandar a cada passo
+        OnStartChaseVoice();
         _waiting = false;
         _timeSinceSeen = 0f;
         _lastKnownPos = playerNavPos;
@@ -285,7 +404,7 @@ public class ZombieAI : MonoBehaviour
     {
         if (!sees) return;
 
-        float dist = Vector3.Distance(transform.position, _target.position);
+        float dist = FlatDistanceToTarget();
         if (dist > _stopDistance + _attackRangeMargin) return;
 
         // Vira-se para o jogador (o agent pára mas não garante que fica virado para ele)
@@ -304,7 +423,73 @@ public class ZombieAI : MonoBehaviour
         _nextAttackTime = Time.time + _attackCooldown;
         if (_animator != null) _animator.SetTrigger(AttackHash);
 
-        // Aplicar o dano ao jogador aqui, ou (melhor) através de um Animation Event no frame do golpe.
+        _pendingHitTime = Time.time + _attackHitDelay; // o dano é aplicado em UpdateAttackHit
+    }
+
+    /// <summary>
+    /// Aplica o dano quando chega o momento do golpe, se o jogador ainda estiver ao alcance.
+    /// </summary>
+    private void UpdateAttackHit()
+    {
+        if (_pendingHitTime < 0f || Time.time < _pendingHitTime) return;
+        _pendingHitTime = -1f;
+
+        if (_targetStats == null || _attackDamage <= 0) return;
+
+        // O golpe só acerta se o jogador não se afastou entretanto
+        float dist = FlatDistanceToTarget();
+        if (dist > _stopDistance + _attackRangeMargin + 0.5f) return;
+
+        _targetStats.TakeDamage(_attackDamage);
+    }
+
+    /// <summary>
+    /// Distância horizontal ao jogador. Ignora a altura, porque a raiz do jogador costuma estar
+    /// ao nível do centro/cabeça e não dos pés, o que fazia a distância 3D ficar sempre acima do alcance.
+    /// </summary>
+    private float FlatDistanceToTarget()
+    {
+        Vector3 d = _target.position - transform.position;
+        d.y = 0f;
+        return d.magnitude;
+    }
+
+    // ---------- Movimento ----------
+
+    /// <summary>
+    /// Garante que só o NavMeshAgent move o zombie: root motion e física a mexer ao mesmo tempo
+    /// duplicam a velocidade e fazem o zombie travar.
+    /// </summary>
+    private void SanitizeMovement()
+    {
+        foreach (Animator a in GetComponentsInChildren<Animator>(true))
+        {
+            if (!a.applyRootMotion) continue;
+            a.applyRootMotion = false;
+            Debug.LogWarning($"ZombieAI: desliguei o Apply Root Motion do Animator '{a.name}' (duplicava o movimento do NavMeshAgent).", this);
+        }
+
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
+        {
+            if (rb.isKinematic) continue;
+            rb.isKinematic = true;
+            Debug.LogWarning($"ZombieAI: pus o Rigidbody '{rb.name}' como Kinematic (a física lutava com o NavMeshAgent).", this);
+        }
+    }
+
+    /// <summary>
+    /// Velocidade horizontal a que o modelo se move de facto (para comparar com a do agent).
+    /// </summary>
+    private void TrackVisualSpeed()
+    {
+        Transform visual = _animator != null ? _animator.transform : transform;
+        Vector3 pos = visual.position;
+
+        Vector3 delta = pos - _lastVisualPos;
+        delta.y = 0f;
+        if (Time.deltaTime > 0f) _visualSpeed = delta.magnitude / Time.deltaTime;
+
+        _lastVisualPos = pos;
     }
 
     // ---------- Sensores ----------
@@ -385,5 +570,20 @@ public class ZombieAI : MonoBehaviour
         Vector3 right = Quaternion.Euler(0f, _viewAngle * 0.5f, 0f) * e.forward;
         Gizmos.DrawRay(e.position, left * _viewDistance);
         Gizmos.DrawRay(e.position, right * _viewDistance);
+
+        // Alcance do ataque
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, _stopDistance + _attackRangeMargin);
+
+#if UNITY_EDITOR
+        if (_showDebug && Application.isPlaying && _agent != null && _target != null)
+        {
+            string info =
+                $"{_state}   consciente: {_dbgSees}   no corredor: {_dbgInCorridor}\n" +
+                $"agent speed {_agent.speed:0.0} | agent vel {_agent.velocity.magnitude:0.0} | modelo {_visualSpeed:0.0}\n" +
+                $"distância {FlatDistanceToTarget():0.00} (alcance {_stopDistance + _attackRangeMargin:0.00})";
+            UnityEditor.Handles.Label(transform.position + Vector3.up * 2.4f, info);
+        }
+#endif
     }
 }

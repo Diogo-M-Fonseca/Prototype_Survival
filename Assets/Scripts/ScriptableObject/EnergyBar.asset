@@ -19,6 +19,10 @@ MonoBehaviour:
   _heldPrefab: {fileID: 4633844183926349423, guid: 09ccda515d8247c48a948ba62e2b4293, type: 3}
   _hasDurability: 0
   _maxDurability: 100
+  _leftoverItem: {fileID: 0}
+  _tags: []
+  _useSound: {fileID: 8300000, guid: 6df562413b8d3c346910f33d1cc79f69, type: 3}
+  _useSoundVolume: 1
   _restores:
   - _stat: 0
     _amount: 30

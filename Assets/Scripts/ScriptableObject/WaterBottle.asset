@@ -21,6 +21,8 @@ MonoBehaviour:
   _maxDurability: 100
   _leftoverItem: {fileID: 11400000, guid: 8c99865fb6dd81444b9039c0ae7195f4, type: 2}
   _tags: []
+  _useSound: {fileID: 8300000, guid: 171dc0a15095fbb48982ff6e6e2666c6, type: 3}
+  _useSoundVolume: 1
   _restores:
   - _stat: 2
     _amount: 30
