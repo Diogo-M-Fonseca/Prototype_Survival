@@ -12,10 +12,13 @@ public class PlayerStats : MonoBehaviour
     [Tooltip("Pontos de sede perdidos por segundo.")]
     [SerializeField] private float _thirstDecreaseRate = 2.5f;
     [SerializeField] private float _starvationDamageRate = 3f;
+    [SerializeField] private GameObject _gameOverMenu;
+    [SerializeField] private Behaviour[] _playerControlScripts;
 
     private float _hungerDrain;
     private float _thirstDrain;
     private float _starvationTimer;
+    private bool _hasDied;
 
     public int MaxHealth => _maxHealth;
     public int CurrentHealth => _currentHealth;
@@ -25,6 +28,16 @@ public class PlayerStats : MonoBehaviour
     private void Awake()
     {
         _currentHealth = _maxHealth;
+
+        if (_gameOverMenu == null)
+        {
+            _gameOverMenu = GameObject.Find("GameOverMenu");
+        }
+
+        if (_gameOverMenu != null)
+        {
+            _gameOverMenu.SetActive(false);
+        }
     }
 
     private void Update()
@@ -47,6 +60,11 @@ public class PlayerStats : MonoBehaviour
         else
         {
             _starvationTimer = 0f;
+        }
+
+        if (!_hasDied && _currentHealth <= 0)
+        {
+            Death();
         }
     }
 
@@ -89,5 +107,37 @@ public class PlayerStats : MonoBehaviour
 
         _currentThirst = Mathf.Min(_currentThirst + thirstAmount, 100);
         return true;
+    }
+
+    private void Death()
+    {
+        _hasDied = true;
+
+        if (_gameOverMenu == null)
+        {
+            Debug.LogError("Game Over Menu is not assigned on PlayerStats.", this);
+        }
+        else
+        {
+            _gameOverMenu.SetActive(true);
+        }
+
+        Behaviour[] controlScripts = _playerControlScripts;
+        if (controlScripts == null || controlScripts.Length == 0)
+        {
+            controlScripts = GetComponents<Behaviour>();
+        }
+
+        foreach (Behaviour playerControlScript in controlScripts)
+        {
+            if (playerControlScript != null && playerControlScript != this)
+            {
+                playerControlScript.enabled = false;
+            }
+        }
+
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }
