@@ -6,6 +6,7 @@ using UnityEngine.AI;
 /// Passeia pelo corredor; se vir o jogador corre atrás dele; se o jogador sair do corredor
 /// (ou o zombie o perder de vista durante algum tempo) volta a passear.
 /// As paredes são respeitadas pelo NavMesh, por isso o zombie nunca bate nelas nem as atravessa.
+/// Controla o Animator através dos parâmetros "Speed" (Float) e "Attack" (Trigger).
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 public class ZombieAI : MonoBehaviour
@@ -47,8 +48,27 @@ public class ZombieAI : MonoBehaviour
     [SerializeField, Min(0f)] private float _waitMax = 4f;
 
     [Header("Perseguição")]
-    [Tooltip("Distância a que o zombie pára junto ao jogador (ligar o ataque aqui).")]
+    [Tooltip("Distância a que o zombie pára junto ao jogador.")]
     [SerializeField, Min(0.1f)] private float _stopDistance = 1.2f;
+
+    [Header("Ataque")]
+    [Tooltip("Margem extra à distância de paragem dentro da qual o zombie ataca.")]
+    [SerializeField, Min(0f)] private float _attackRangeMargin = 0.3f;
+
+    [Tooltip("Segundos entre ataques.")]
+    [SerializeField, Min(0.1f)] private float _attackCooldown = 1.5f;
+
+    [Tooltip("Velocidade com que o zombie se vira para o jogador ao atacar.")]
+    [SerializeField, Min(0f)] private float _attackTurnSpeed = 10f;
+
+    [Header("Animação")]
+    [Tooltip("Animator do zombie. Se vazio, procura nos filhos.")]
+    [SerializeField] private Animator _animator;
+
+    [SerializeField, Min(0f)] private float _speedDampTime = 0.1f;
+
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int AttackHash = Animator.StringToHash("Attack");
 
     private NavMeshAgent _agent;
     private CharacterController _targetController;
@@ -60,6 +80,7 @@ public class ZombieAI : MonoBehaviour
     private float _timeSinceSeen;
     private float _waitTimer;
     private float _repathTimer;
+    private float _nextAttackTime;
     private bool _waiting;
 
     private readonly RaycastHit[] _hits = new RaycastHit[16];
@@ -74,6 +95,7 @@ public class ZombieAI : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
         _path = new NavMeshPath();
         if (_eyes == null) _eyes = transform;
+        if (_animator == null) _animator = GetComponentInChildren<Animator>();
 
         int area = NavMesh.GetAreaFromName(_corridorArea);
         if (area < 0)
@@ -113,6 +135,8 @@ public class ZombieAI : MonoBehaviour
 
     private void Update()
     {
+        UpdateAnimator();
+
         if (!_agent.isOnNavMesh) return;
 
         // O jogador só conta se os seus pés estiverem no corredor
@@ -121,6 +145,16 @@ public class ZombieAI : MonoBehaviour
 
         if (_state == State.Wander) UpdateWander(sees, playerNavPos);
         else UpdateChase(inCorridor, sees, playerNavPos);
+    }
+
+    // ---------- Animação ----------
+
+    private void UpdateAnimator()
+    {
+        if (_animator == null) return;
+
+        // Velocidade real do agent (0 parado, ~walk a passear, ~run a perseguir)
+        _animator.SetFloat(SpeedHash, _agent.velocity.magnitude, _speedDampTime, Time.deltaTime);
     }
 
     // ---------- Passeio ----------
@@ -218,6 +252,9 @@ public class ZombieAI : MonoBehaviour
             }
         }
 
+        // Ataque: perto do jogador e a vê-lo
+        TryAttack(sees);
+
         // Atualiza o destino a cada 0.1 s em vez de todos os frames
         _repathTimer -= Time.deltaTime;
         if (_repathTimer <= 0f)
@@ -240,6 +277,34 @@ public class ZombieAI : MonoBehaviour
         _timeSinceSeen = 0f;
         _lastKnownPos = playerNavPos;
         _repathTimer = 0f;
+    }
+
+    // ---------- Ataque ----------
+
+    private void TryAttack(bool sees)
+    {
+        if (!sees) return;
+
+        float dist = Vector3.Distance(transform.position, _target.position);
+        if (dist > _stopDistance + _attackRangeMargin) return;
+
+        // Vira-se para o jogador (o agent pára mas não garante que fica virado para ele)
+        Vector3 flat = _target.position - transform.position;
+        flat.y = 0f;
+        if (flat.sqrMagnitude > 0.01f)
+        {
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                Quaternion.LookRotation(flat),
+                _attackTurnSpeed * Time.deltaTime);
+        }
+
+        if (Time.time < _nextAttackTime) return;
+
+        _nextAttackTime = Time.time + _attackCooldown;
+        if (_animator != null) _animator.SetTrigger(AttackHash);
+
+        // Aplicar o dano ao jogador aqui, ou (melhor) através de um Animation Event no frame do golpe.
     }
 
     // ---------- Sensores ----------
